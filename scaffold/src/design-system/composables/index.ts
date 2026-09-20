@@ -1,3 +1,6 @@
 export { initTheme, useTheme } from './useTheme'
+export type { ThemeTransitionMode } from './useTheme'
 export { useCssToken } from './useCssToken'
 export { useArrowNavigation } from './useArrowNavigation'
+export { initMotion, useMotion } from './useMotion'
+export type { MotionScale, ReducedMotionMode } from './useMotion'

@@ -1,0 +1,56 @@
+/*
+  Токены движения. Не зависят от темы.
+  Кривые и длительности зеркалируются в motion/tokens.ts для анимаций на JS — менять в обоих местах.
+*/
+:root {
+  /* Замедление для проверки на глаз (×1, ×2, ×5): множитель длительностей. Меняется только на странице анимаций. */
+  --motion-scale: 1;
+  /* Множитель смещений и масштаба: 1 — полное движение, 0 — движение убрано, остаётся прозрачность и цвет. */
+  --motion-distance: 1;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --dur-press: calc(160ms * var(--motion-scale));
+  --dur-hover: calc(150ms * var(--motion-scale));
+  --dur-tooltip: calc(125ms * var(--motion-scale));
+  --dur-dropdown: calc(200ms * var(--motion-scale));
+  --dur-modal: calc(250ms * var(--motion-scale));
+  --dur-drawer: calc(500ms * var(--motion-scale));
+  --dur-toast: calc(400ms * var(--motion-scale));
+  --dur-page-in: calc(220ms * var(--motion-scale));
+  --dur-page-out: calc(120ms * var(--motion-scale));
+  --dur-theme: calc(420ms * var(--motion-scale));
+}
+
+/* Уменьшенное движение — это меньше и мягче, а не «совсем без анимации»: смещения и масштаб уходят, прозрачность остаётся. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-distance: 0;
+  }
+}
+
+:root[data-reduced-motion='true'] {
+  --motion-distance: 0;
+}
+
+:root[data-reduced-motion='false'] {
+  --motion-distance: 1;
+}
+
+/* Смена темы через View Transitions API: круг от места нажатия («reveal») или плавное затухание («fade»). */
+:root[data-theme-transition='reveal']::view-transition-old(root),
+:root[data-theme-transition='reveal']::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+:root[data-theme-transition='reveal']::view-transition-new(root) {
+  z-index: 1;
+}
+
+:root[data-theme-transition='fade']::view-transition-group(root) {
+  animation-duration: calc(200ms * var(--motion-scale));
+  animation-timing-function: var(--ease-out);
+}

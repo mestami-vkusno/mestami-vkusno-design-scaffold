@@ -1,7 +1,9 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import { initTheme } from '@/design-system'
+import { initMotion, initTheme } from '@/design-system'
 import '@/design-system/styles/index.css'
+import { router } from './router'
 
 initTheme()
-createApp(App).mount('#app')
+initMotion()
+createApp(App).use(router).mount('#app')

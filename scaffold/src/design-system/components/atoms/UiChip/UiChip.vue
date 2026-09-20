@@ -42,10 +42,11 @@ const emit = defineEmits<{ remove: [] }>()
   font: 500 14px var(--font);
   cursor: pointer;
   white-space: nowrap;
+  transition: background var(--dur-hover) ease, border-color var(--dur-hover) ease, color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
 }
 
-.ui-chip:hover {
-  background: var(--surface);
+.ui-chip:active {
+  transform: scale(calc(1 - 0.03 * var(--motion-distance)));
 }
 
 .ui-chip__icon {
@@ -69,10 +70,6 @@ const emit = defineEmits<{ remove: [] }>()
   font-weight: 600;
 }
 
-.ui-chip--selected:hover {
-  background: var(--lime-hover);
-}
-
 .ui-chip--selected .ui-chip__icon {
   color: var(--on-accent);
 }
@@ -81,10 +78,6 @@ const emit = defineEmits<{ remove: [] }>()
   background: var(--inverse-bg);
   color: var(--inverse-text);
   border-color: transparent;
-}
-
-.ui-chip--inverse:hover {
-  background: var(--inverse-bg);
 }
 
 .ui-chip--tag {
@@ -104,10 +97,6 @@ const emit = defineEmits<{ remove: [] }>()
   cursor: pointer;
 }
 
-.ui-chip__remove:hover {
-  color: var(--text);
-}
-
 @media (pointer: coarse) {
   .ui-chip {
     min-height: 40px;
@@ -115,6 +104,26 @@ const emit = defineEmits<{ remove: [] }>()
 
   .ui-chip--sm {
     height: 40px;
+  }
+}
+
+/* Наведение только там,
+где есть настоящий указатель: на тач-экранах :hover срабатывает ложно. */
+@media (hover: hover) and (pointer: fine) {
+  .ui-chip:hover {
+    background: var(--surface);
+  }
+
+  .ui-chip--selected:hover {
+    background: var(--lime-hover);
+  }
+
+  .ui-chip--inverse:hover {
+    background: var(--inverse-bg);
+  }
+
+  .ui-chip__remove:hover {
+    color: var(--text);
   }
 }
 </style>

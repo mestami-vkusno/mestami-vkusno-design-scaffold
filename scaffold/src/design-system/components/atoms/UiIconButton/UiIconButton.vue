@@ -35,7 +35,11 @@ const emit = defineEmits<{ 'update:pressed': [value: boolean] }>()
   cursor: pointer;
   color: var(--text);
   text-decoration: none;
-  transition: background 0.15s;
+  transition: background var(--dur-hover) ease, color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
+}
+
+.ui-icon-button:active {
+  transform: scale(calc(1 - 0.06 * var(--motion-distance)));
 }
 
 .ui-icon-button--sm {
@@ -47,17 +51,9 @@ const emit = defineEmits<{ 'update:pressed': [value: boolean] }>()
   border: 1px solid var(--border-strong);
 }
 
-.ui-icon-button--overlay:hover {
-  background: var(--surface);
-}
-
 .ui-icon-button--plain {
   background: none;
   border: 0;
-}
-
-.ui-icon-button--plain:hover {
-  background: var(--surface);
 }
 
 .ui-icon-button--on {
@@ -71,6 +67,18 @@ const emit = defineEmits<{ 'update:pressed': [value: boolean] }>()
 @media (pointer: coarse) {
   .ui-icon-button--sm {
     --h: 40px;
+  }
+}
+
+/* Наведение только там,
+где есть настоящий указатель: на тач-экранах :hover срабатывает ложно. */
+@media (hover: hover) and (pointer: fine) {
+  .ui-icon-button--overlay:hover {
+    background: var(--surface);
+  }
+
+  .ui-icon-button--plain:hover {
+    background: var(--surface);
   }
 }
 </style>

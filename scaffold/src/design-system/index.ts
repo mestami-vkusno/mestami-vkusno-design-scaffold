@@ -1,4 +1,5 @@
 export * from './components'
 export * from './composables'
 export * from './icons'
+export * from './motion'
 export type * from './types'

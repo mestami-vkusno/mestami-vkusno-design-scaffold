@@ -42,7 +42,7 @@ const model = defineModel<boolean>({ default: false })
   border: 1px solid var(--border-strong);
   border-radius: var(--r-pill);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--dur-hover) ease, border-color var(--dur-hover) ease;
 }
 
 .ui-switch__input::after {
@@ -54,7 +54,7 @@ const model = defineModel<boolean>({ default: false })
   height: 18px;
   border-radius: 50%;
   background: var(--text-2);
-  transition: transform 0.15s, background 0.15s;
+  transition: transform var(--dur-dropdown) var(--ease-out), background var(--dur-hover) ease;
 }
 
 .ui-switch__input:checked {

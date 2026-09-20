@@ -39,9 +39,4 @@ code {
   html {
     scroll-behavior: auto;
   }
-
-  * {
-    transition: none !important;
-    animation: none !important;
-  }
 }

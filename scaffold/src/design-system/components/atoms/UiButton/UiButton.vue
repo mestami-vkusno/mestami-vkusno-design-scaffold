@@ -44,12 +44,12 @@ const iconSize = computed(() => (props.size === 'sm' ? 16 : 20))
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
-  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.05s;
+  transition: background var(--dur-hover) ease, border-color var(--dur-hover) ease, color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
 }
 
-.ui-button:active,
+.ui-button:active:not(:disabled),
 .ui-button[data-preview='pressed'] {
-  transform: translateY(1px);
+  transform: scale(calc(1 - 0.03 * var(--motion-distance)));
 }
 
 .ui-button[data-preview='focus'] {
@@ -79,7 +79,6 @@ const iconSize = computed(() => (props.size === 'sm' ? 16 : 20))
   color: var(--on-accent);
 }
 
-.ui-button--primary:hover,
 .ui-button--primary[data-preview='hover'] {
   background: var(--lime-hover);
 }
@@ -95,7 +94,6 @@ const iconSize = computed(() => (props.size === 'sm' ? 16 : 20))
   border-color: var(--outline-border);
 }
 
-.ui-button--outline:hover,
 .ui-button--outline[data-preview='hover'],
 .ui-button--outline[data-preview='pressed'] {
   background: var(--outline-hover);
@@ -107,7 +105,6 @@ const iconSize = computed(() => (props.size === 'sm' ? 16 : 20))
   border-color: var(--border-strong);
 }
 
-.ui-button--neutral:hover,
 .ui-button--neutral[data-preview='hover'],
 .ui-button--neutral[data-preview='pressed'] {
   background: var(--surface);
@@ -119,7 +116,6 @@ const iconSize = computed(() => (props.size === 'sm' ? 16 : 20))
   color: var(--btn2-text);
 }
 
-.ui-button--secondary:hover,
 .ui-button--secondary[data-preview='hover'],
 .ui-button--secondary[data-preview='pressed'] {
   background: var(--btn2-hover);
@@ -130,7 +126,6 @@ const iconSize = computed(() => (props.size === 'sm' ? 16 : 20))
   color: var(--text-2);
 }
 
-.ui-button--ghost:hover,
 .ui-button--ghost[data-preview='hover'],
 .ui-button--ghost[data-preview='pressed'] {
   color: var(--text);
@@ -167,6 +162,32 @@ const iconSize = computed(() => (props.size === 'sm' ? 16 : 20))
 @media (pointer: coarse) {
   .ui-button--sm {
     --h: 40px;
+  }
+}
+
+/* Наведение только там,
+где есть настоящий указатель: на тач-экранах :hover срабатывает ложно. */
+@media (hover: hover) and (pointer: fine) {
+  .ui-button--primary:hover {
+    background: var(--lime-hover);
+  }
+
+  .ui-button--outline:hover {
+    background: var(--outline-hover);
+  }
+
+  .ui-button--neutral:hover {
+    background: var(--surface);
+    border-color: #555;
+  }
+
+  .ui-button--secondary:hover {
+    background: var(--btn2-hover);
+  }
+
+  .ui-button--ghost:hover {
+    color: var(--text);
+    background: var(--surface);
   }
 }
 </style>
