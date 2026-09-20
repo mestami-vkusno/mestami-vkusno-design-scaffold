@@ -1,0 +1,128 @@
+/*
+  Токены дизайн-системы «Местами вкусно».
+  Базовая палитра — из ТЗ (materials/tz/b2c.md §25А.1); значения, измеренные на референсах, — в комментариях.
+  Тема задаётся атрибутом data-theme на <html> или на любом блоке (см. UiThemeScope).
+*/
+:root, [data-theme="dark"] {
+  color-scheme: dark;
+  /* Основа */
+  --bg:            #0D0D0D;   /* основной фон; на референсах ≈ #050505–#0D0D0D */
+  --surface:       #1A1A1A;   /* поверхности и карточки (ТЗ: около #1A1A1A) */
+  --surface-2:     #222222;   /* вложенная поверхность, наведение */
+  --field:         #141414;   /* поля ввода */
+  --border:        #2A2A2A;   /* границы и разделители */
+  --border-strong: #3D3D3D;   /* границы элементов управления */
+
+  /* Текст */
+  --text:          #FFFFFF;
+  --text-2:        #B8B8B8;   /* вторичный */
+  --text-3:        #8C8C8C;   /* подписи, подсказки */
+  --on-accent:     #0D0D0D;   /* текст на лаймовом */
+
+  /* Акцент */
+  --lime:          #CCFF00;   /* ТЗ; на референсах ≈ #C8E600 */
+  --accent-fg:     #CCFF00;   /* акцент как текст, иконка, линия */
+  --deco:          #CCFF00;   /* декоративные линии и метки */
+  --lime-hover:    #DBFF3F;
+  --lime-press:    #B4E000;
+  --lime-soft:     rgba(204, 255, 0, .12);
+  --lime-line:     rgba(204, 255, 0, .45);
+
+  /* Семантика */
+  --success:       #3DDC84;
+  --warning:       #FF9A3D;
+  --danger:        #FF5C5C;
+  --star:          #FFC933;
+
+  /* Шрифт */
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Радиусы */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 10px; --r-lg: 16px; --r-xl: 24px; --r-pill: 999px;
+
+  /* Отступы (шаг 4 px) */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px; --s-16: 64px;
+
+  /* Служебные, зависят от темы */
+  --topbar-bg:      rgba(13, 13, 13, .88);
+  --panel-bg:       rgba(26, 26, 26, .6);
+  --search-bg:      #F2F2F2;  --search-text: #111111;  --search-ph: #777777;  --search-border: transparent;
+  --inverse-bg:     #F2F2F2;  --inverse-text: #111111;
+  --btn2-bg:        #BDBDBD;  --btn2-hover: #D0D0D0;
+  --overlay-btn-bg: rgba(0, 0, 0, .45);
+  --badge-bg:       rgba(0, 0, 0, .35);
+  --promo-tint:     rgba(204, 255, 0, .10);
+  --mark:           #CCFF00;   --mark-fill: none;   --pin-fill: var(--bg);
+  --shadow-card:    none;
+
+  /* Как лайм ведёт себя в компонентах (в тёмной — сам лайм, в светлой — подложка-маркер) */
+  --accent-mark:    none;                     /* маркер под акцентным словом */
+  --link-line:      currentColor;  --link-thick: 1px;
+  --outline-border: var(--lime-line);  --outline-hover: var(--lime-soft);
+  --badge-accent-bg: var(--badge-bg);  --badge-accent-line: var(--lime-line);
+  --switch-on-bg:   var(--lime-soft);  --switch-on-line: var(--lime-line);  --switch-on-knob: var(--accent-fg);
+  --btn2-text:      var(--on-accent);
+  --stat-icon-bg:   transparent;  --stat-icon-size: 26px;  --stat-icon-pad: 0px;
+  --tab-active-bg:  transparent;
+
+  /* Эффекты */
+  --glow: 0 0 48px rgba(204, 255, 0, .14);
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-fg);
+}
+
+[data-theme] { color: var(--text); }
+
+/* Светлая тема. Лайм остаётся базовым цветом, но на белом он не читается как текст,
+   поэтому в светлой теме он работает подложкой-маркером: заливка кнопок и чипов, линия под
+   активной вкладкой и ссылкой, кружок под иконкой, маркер под акцентным словом.
+   Текст и иконки при этом чёрные. Нейтрали — чистые серые, без бежевого и зелёного оттенка. */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg:            #FFFFFF;
+  --surface:       #F3F3F3;
+  --surface-2:     #E8E8E8;
+  --field:         #FFFFFF;
+  --border:        #E3E3E3;
+  --border-strong: #8A8A8A;   /* ≥ 3:1 на белом — граница элементов управления */
+
+  --text:          #0D0D0D;
+  --text-2:        #4B4B4B;
+  --text-3:        #6A6A6A;
+  --on-accent:     #0D0D0D;
+
+  --lime:          #CCFF00;
+  --lime-hover:    #C1F200;
+  --lime-press:    #AEDB00;
+  --lime-soft:     rgba(204, 255, 0, .38);
+  --lime-line:     rgba(13, 13, 13, .32);
+  --accent-fg:     #0D0D0D;   /* «акцент как текст» в светлой теме — чёрный */
+  --deco:          #0D0D0D;
+
+  --success:       #0F7A44;
+  --warning:       #A94B00;
+  --danger:        #C42B2B;
+  --star:          #F5B301;
+
+  --topbar-bg:      rgba(255, 255, 255, .92);
+  --panel-bg:       #FFFFFF;
+  --search-bg:      #FFFFFF;  --search-text: #0D0D0D;  --search-ph: #6A6A6A;  --search-border: #8A8A8A;
+  --inverse-bg:     #0D0D0D;  --inverse-text: #FFFFFF;
+  --btn2-bg:        #0D0D0D;  --btn2-hover: #2B2B2B;
+  --overlay-btn-bg: rgba(255, 255, 255, .92);
+  --badge-bg:       rgba(255, 255, 255, .94);
+  --promo-tint:     rgba(204, 255, 0, .10);
+  --mark:           #0D0D0D;  --mark-fill: #CCFF00;  --pin-fill: #CCFF00;
+  --shadow-card:    0 1px 2px rgba(0, 0, 0, .05), 0 10px 28px rgba(0, 0, 0, .06);
+
+  --accent-mark:    linear-gradient(transparent 52%, var(--lime) 52%, var(--lime) 94%, transparent 94%);
+  --link-line:      var(--lime);  --link-thick: 3px;
+  --outline-border: #0D0D0D;      --outline-hover: var(--lime);
+  --badge-accent-bg: rgba(204, 255, 0, .5);  --badge-accent-line: rgba(13, 13, 13, .3);
+  --switch-on-bg:   var(--lime);  --switch-on-line: #0D0D0D;  --switch-on-knob: #0D0D0D;
+  --btn2-text:      #FFFFFF;
+  --stat-icon-bg:   var(--lime);  --stat-icon-size: 40px;  --stat-icon-pad: 9px;
+  --tab-active-bg:  var(--lime);
+
+  --glow: 0 10px 40px rgba(170, 220, 0, .35);
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px #0D0D0D;
+}

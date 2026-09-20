@@ -1,42 +1,50 @@
-# scaffold
+# scaffold — Vue-разметка дизайн-системы «Местами вкусно»
 
-This template should help get you started developing with Vue 3 in Vite.
+Каркас фронтенда: дизайн-система из `../design-system.html`, разобранная на минимальные типизированные компоненты Vue 3 + TypeScript, и страница-витрина, которая их показывает. Документы в `materials/` рабочей области — источник истины по функциям; здесь только форма, цвет и состояния.
 
-## Recommended IDE Setup
-
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+## Запуск
 
 ```sh
 bun install
+bun dev             # витрина на http://localhost:5173
+bun run build       # проверка типов (vue-tsc) и сборка
+bun run type-check
 ```
 
-### Compile and Hot-Reload for Development
+## Структура
 
-```sh
-bun dev
+```
+src/
+  main.ts                    точка входа: тема + стили + монтирование
+  App.vue                    монтирует витрину
+  design-system/             сама дизайн-система (не знает о витрине и о продукте)
+    styles/                  tokens.css (тёмная и светлая тема), base.css
+    icons/shapes.ts          типизированный реестр иконок (IconName)
+    types/                   общие типы: ThemeName, SpaceToken, NavItem, ...
+    composables/             useTheme, useCssToken, useArrowNavigation
+    components/
+      layout/                UiStack, UiCluster, UiGrid — раскладка
+      atoms/                 неделимые элементы: UiButton, UiInput, UiBadge, UiIcon, ...
+      molecules/             сборки из атомов: UiField, UiTabs, UiMediaCard, ...
+      organisms/             крупные блоки: UiAppHeader, UiTabBar, UiFooter, ...
+    index.ts                 публичный API (`@/design-system`)
+  showcase/                  страница-витрина (только для просмотра системы)
+    components/              обвязка страницы: секция, сцена, образец цвета
+    sections/                разделы: цвета, кнопки, поля, карточки, ...
+    data/                    типизированные данные для витрины
 ```
 
-### Type-Check, Compile and Minify for Production
+## Правила
 
-```sh
-bun run build
-```
+- **Слои идут вниз.** `layout` и `atoms` не импортируют ничего выше; `molecules` собираются из `atoms`; `organisms` — из `atoms` и `molecules`. Витрина импортирует только из `@/design-system`.
+- **Один компонент — одна папка.** `UiName/UiName.vue` и рядом `types.ts` с интерфейсом пропсов (`UiNameProps`) и связанными типами. Публичные имена и типы экспортируются из `index.ts` слоя.
+- **Стили только через токены.** Цвета, отступы, радиусы — `var(--…)` из `tokens.css`. Тема переключается атрибутом `data-theme` на `<html>` или на любом блоке (`UiThemeScope`).
+- **Состояния для витрины.** У `UiButton` и `UiInput` есть `previewState` — принудительно показывает hover/pressed/focus; в продукте не используется.
+- **Доступность.** Иконочные кнопки требуют `label`; поля получают `id` и `aria-describedby` от `UiField` через слот; вкладки и сегменты управляются стрелками.
+- **Данные не в компонентах.** Тексты и списки живут в `showcase/data`, компоненты принимают их пропсами.
+
+## Что дальше
+
+- Заменить текстовый макет логотипа (`UiLogo`) оригинальным знаком.
+- Подключить шрифт локально вместо Google Fonts, если нужен запуск без сети.
+- Добавить тесты компонентов и линтер, когда определится стек продукта.

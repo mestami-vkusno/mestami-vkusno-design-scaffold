@@ -1,0 +1,11 @@
+export { default as UiAppHeader } from './UiAppHeader/UiAppHeader.vue'
+export { default as UiTabBar } from './UiTabBar/UiTabBar.vue'
+export { default as UiSideMenu } from './UiSideMenu/UiSideMenu.vue'
+export { default as UiFooter } from './UiFooter/UiFooter.vue'
+export { default as UiPromoPanel } from './UiPromoPanel/UiPromoPanel.vue'
+
+export type { UiAppHeaderProps } from './UiAppHeader/types'
+export type { UiTabBarProps, TabBarItem } from './UiTabBar/types'
+export type { UiSideMenuProps } from './UiSideMenu/types'
+export type { UiFooterProps, FooterColumn, FooterLink, FooterSocial } from './UiFooter/types'
+export type { UiPromoPanelProps } from './UiPromoPanel/types'
