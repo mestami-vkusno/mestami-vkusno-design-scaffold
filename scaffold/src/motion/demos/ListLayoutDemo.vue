@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { AnimatePresence, Motion } from 'motion-v'
-import { UiButton, UiIcon, useMotion } from '@/design-system'
+import { UiButton, UiIcon } from '@/design-system'
 import MotionDemo from '../components/MotionDemo.vue'
 
 interface Item {
@@ -17,7 +16,6 @@ const items = ref<Item[]>([
   { id: 2, title: 'Пельмени' },
   { id: 3, title: 'Оливье' },
 ])
-const { duration } = useMotion()
 
 function add(): void {
   counter += 1
@@ -36,35 +34,24 @@ function remove(id: number): void {
     purpose="state"
     description="Новый элемент появляется сверху, удаляемый уходит, а соседи плавно сдвигаются, а не прыгают. Всё прерываемо: нажимайте быстрее, чем идёт анимация."
     :specs="[
-      { label: 'Инструмент', value: 'Motion: AnimatePresence popLayout + layout' },
-      { label: 'Свойства', value: 'opacity, transform, layout' },
-      { label: 'Пружина', value: 'duration 0.35, bounce 0' },
+      { label: 'Инструмент', value: 'Vue <TransitionGroup> + CSS (FLIP через -move)' },
+      { label: 'Свойства', value: 'opacity, transform' },
+      { label: 'Кривая', value: 'var(--ease-out), 250 мс; сдвиг соседей 300 мс' },
     ]"
   >
     <template #actions><UiButton size="sm" icon-left="bookmark" @click="add">Добавить</UiButton></template>
-    <ul class="layout-list">
-      <AnimatePresence mode="popLayout">
-        <Motion
-          v-for="item in items"
-          :key="item.id"
-          as="li"
-          layout
-          class="layout-list__item"
-          :initial="{ opacity: 0, transform: 'translateY(-8px) scale(0.98)' }"
-          :animate="{ opacity: 1, transform: 'translateY(0px) scale(1)' }"
-          :exit="{ opacity: 0, transform: 'translateY(0px) scale(0.96)' }"
-          :transition="{ type: 'spring', duration: duration(0.35), bounce: 0 }"
-        >
-          <span>{{ item.title }}</span>
-          <button class="layout-list__remove" type="button" :aria-label="`Убрать: ${item.title}`" @click="remove(item.id)"><UiIcon name="close" :size="16" /></button>
-        </Motion>
-      </AnimatePresence>
-    </ul>
+    <TransitionGroup name="layout-item" tag="ul" class="layout-list">
+      <li v-for="item in items" :key="item.id" class="layout-list__item">
+        <span>{{ item.title }}</span>
+        <button class="layout-list__remove" type="button" :aria-label="`Убрать: ${item.title}`" @click="remove(item.id)"><UiIcon name="close" :size="16" /></button>
+      </li>
+    </TransitionGroup>
   </MotionDemo>
 </template>
 
 <style scoped>
 .layout-list {
+  position: relative;
   display: grid;
   align-content: start;
   gap: 8px;
@@ -94,6 +81,32 @@ function remove(id: number): void {
   background: transparent;
   color: var(--text-3);
   cursor: pointer;
+}
+
+.layout-item-enter-active,
+.layout-item-leave-active {
+  transition:
+    opacity calc(250ms * var(--motion-scale)) var(--ease-out),
+    transform calc(250ms * var(--motion-scale)) var(--ease-out);
+}
+
+.layout-item-leave-active {
+  position: absolute;
+  inset-inline: 0;
+}
+
+.layout-item-enter-from {
+  opacity: 0;
+  transform: translateY(calc(-8px * var(--motion-distance))) scale(calc(1 - 0.02 * var(--motion-distance)));
+}
+
+.layout-item-leave-to {
+  opacity: 0;
+  transform: scale(calc(1 - 0.04 * var(--motion-distance)));
+}
+
+.layout-item-move {
+  transition: transform calc(300ms * var(--motion-scale)) var(--ease-out);
 }
 
 @media (hover: hover) and (pointer: fine) {

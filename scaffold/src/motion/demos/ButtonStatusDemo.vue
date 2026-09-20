@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref } from 'vue'
-import { AnimatePresence, Motion } from 'motion-v'
+import { AnimatePresence, m } from 'motion-v'
 import { UiButton, UiIcon, useMotion } from '@/design-system'
 import MotionDemo from '../components/MotionDemo.vue'
 
@@ -42,9 +42,8 @@ onBeforeUnmount(() => clearTimeout(timer))
     <div class="status">
       <UiButton class="status__button" :aria-busy="status === 'loading'" @click="press">
         <AnimatePresence mode="popLayout" :initial="false">
-          <Motion
+          <m.span
             :key="status"
-            as="span"
             class="status__content"
             :initial="{ opacity: 0, transform: 'scale(0.25)', filter: 'blur(4px)' }"
             :animate="{ opacity: 1, transform: 'scale(1)', filter: 'blur(0px)' }"
@@ -55,7 +54,7 @@ onBeforeUnmount(() => clearTimeout(timer))
             <UiIcon v-else-if="status === 'success'" name="check" />
             <UiIcon v-else name="bookmark" />
             {{ LABEL[status] }}
-          </Motion>
+          </m.span>
         </AnimatePresence>
       </UiButton>
       <span class="status__live" role="status">{{ LABEL[status] }}</span>

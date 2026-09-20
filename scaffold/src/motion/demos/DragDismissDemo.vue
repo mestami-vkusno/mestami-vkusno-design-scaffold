@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Motion } from 'motion-v'
+import { m } from 'motion-v'
 import type { PanInfo } from 'motion-v'
 import { SPRING, UiButton, UiCluster, UiIcon, UiText, useMotion } from '@/design-system'
 import MotionDemo from '../components/MotionDemo.vue'
@@ -38,7 +38,7 @@ function dismiss(direction: -1 | 1): void {
     <template #actions><UiButton v-if="dismissedTo !== 0" size="sm" icon-left="refresh" @click="dismissedTo = 0">Вернуть</UiButton></template>
     <template #note>Смахивание — жест, поэтому у него есть кнопочная альтернатива: «Убрать» делает то же самое без перетаскивания.</template>
     <div class="drag">
-      <Motion
+      <m.div
         class="drag__card"
         drag="x"
         :drag-constraints="{ left: 0, right: 0 }"
@@ -53,7 +53,7 @@ function dismiss(direction: -1 | 1): void {
           <b>Напоминание о записи</b>
           <UiText variant="caption">Смахните в сторону, чтобы убрать</UiText>
         </div>
-      </Motion>
+      </m.div>
       <UiCluster v-if="dismissedTo === 0" class="drag__actions">
         <UiButton size="sm" variant="ghost" @click="dismiss(-1)">Убрать</UiButton>
       </UiCluster>

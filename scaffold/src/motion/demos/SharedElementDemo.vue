@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { LayoutGroup, Motion } from 'motion-v'
+import { LayoutGroup, m } from 'motion-v'
 import { UiButton, useMotion } from '@/design-system'
 import type { ImageTone } from '@/design-system'
 import MotionDemo from '../components/MotionDemo.vue'
@@ -41,10 +41,9 @@ const transition = computed(() => ({ type: 'spring' as const, duration: duration
     <LayoutGroup>
       <PhoneFrame>
         <div v-if="!opened" class="shared__list">
-          <Motion
+          <m.button
             v-for="place in PLACES"
             :key="place.id"
-            as="button"
             type="button"
             class="shared__card"
             :layout-id="`shared-${place.id}`"
@@ -53,22 +52,22 @@ const transition = computed(() => ({ type: 'spring' as const, duration: duration
             @click="openId = place.id"
           >
             <span class="shared__caption">{{ place.title }}</span>
-          </Motion>
+          </m.button>
         </div>
         <div v-else class="shared__detail">
-          <Motion
+          <m.div
             :key="opened.id"
             class="shared__hero"
             :layout-id="`shared-${opened.id}`"
             :style="{ background: opened.gradient, borderRadius: '0px' }"
             :transition="transition"
           />
-          <Motion class="shared__text" :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: duration(0.2), delay: duration(0.15) }">
+          <m.div class="shared__text" :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: duration(0.2), delay: duration(0.15) }">
             <b>{{ opened.title }}</b>
             <i class="shared__line" />
             <i class="shared__line shared__line--short" />
             <UiButton size="sm" variant="neutral" icon-left="arrow-l" @click="openId = null">К списку</UiButton>
-          </Motion>
+          </m.div>
         </div>
       </PhoneFrame>
     </LayoutGroup>

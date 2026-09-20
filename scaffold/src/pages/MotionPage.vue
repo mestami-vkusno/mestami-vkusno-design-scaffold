@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount } from 'vue'
-import { MotionConfig } from 'motion-v'
+import { LazyMotion, MotionConfig } from 'motion-v'
 import { useMotion } from '@/design-system'
 import SiteTopbar from '@/shell/SiteTopbar.vue'
 import ShowcaseFooter from '@/showcase/components/ShowcaseFooter.vue'
@@ -17,6 +17,7 @@ import MotionThemeSection from '@/motion/sections/MotionThemeSection.vue'
 import MotionTokensSection from '@/motion/sections/MotionTokensSection.vue'
 
 const { motionConfigMode, setScale, setReducedMode } = useMotion()
+const loadMotionFeatures = () => import('@/motion/features').then((module) => module.default)
 
 // Замедление и принудительный режим нужны только на этой странице: остальные страницы не должны их наследовать.
 onBeforeUnmount(() => {
@@ -29,6 +30,7 @@ onBeforeUnmount(() => {
   <div class="page">
     <SiteTopbar :sections="MOTION_SECTIONS" />
     <MotionConfig :reduced-motion="motionConfigMode">
+      <LazyMotion :features="loadMotionFeatures" strict>
       <main id="top" class="motion-page">
         <MotionHero />
         <MotionTokensSection />
@@ -40,6 +42,7 @@ onBeforeUnmount(() => {
         <MotionGesturesSection />
         <MotionRestraintSection />
       </main>
+      </LazyMotion>
     </MotionConfig>
     <ShowcaseFooter />
     <MotionToolbar />
