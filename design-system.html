@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0D0D0D">
+<title>Дизайн-система «Местами вкусно»</title>
+<meta name="description" content="Каркас дизайн-системы: токены, типографика, компоненты. Без контекста приложения.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap&subset=cyrillic" rel="stylesheet">
+<style>
+/* ============================================================
+   ТОКЕНЫ
+   Базовая палитра — из ТЗ (materials/tz/b2c.md §25А.1).
+   Значения, измеренные на референсах, указаны в комментариях.
+   ============================================================ */
+:root, [data-theme="dark"] {
+  color-scheme: dark;
+  /* Основа */
+  --bg:            #0D0D0D;   /* основной фон; на референсах ≈ #050505–#0D0D0D */
+  --surface:       #1A1A1A;   /* поверхности и карточки (ТЗ: около #1A1A1A) */
+  --surface-2:     #222222;   /* вложенная поверхность, наведение */
+  --field:         #141414;   /* поля ввода */
+  --border:        #2A2A2A;   /* границы и разделители */
+  --border-strong: #3D3D3D;   /* границы элементов управления */
+
+  /* Текст */
+  --text:          #FFFFFF;
+  --text-2:        #B8B8B8;   /* вторичный */
+  --text-3:        #8C8C8C;   /* подписи, подсказки */
+  --on-accent:     #0D0D0D;   /* текст на лаймовом */
+
+  /* Акцент */
+  --lime:          #CCFF00;   /* ТЗ; на референсах ≈ #C8E600 */
+  --accent-fg:     #CCFF00;   /* акцент как текст, иконка, линия */
+  --deco:          #CCFF00;   /* декоративные линии и метки */
+  --lime-hover:    #DBFF3F;
+  --lime-press:    #B4E000;
+  --lime-soft:     rgba(204, 255, 0, .12);
+  --lime-line:     rgba(204, 255, 0, .45);
+
+  /* Семантика */
+  --success:       #3DDC84;
+  --warning:       #FF9A3D;
+  --danger:        #FF5C5C;
+  --star:          #FFC933;
+
+  /* Шрифт */
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Радиусы */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 10px; --r-lg: 16px; --r-xl: 24px; --r-pill: 999px;
+
+  /* Отступы (шаг 4 px) */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px; --s-16: 64px;
+
+  /* Служебные, зависят от темы */
+  --topbar-bg:      rgba(13, 13, 13, .88);
+  --panel-bg:       rgba(26, 26, 26, .6);
+  --search-bg:      #F2F2F2;  --search-text: #111111;  --search-ph: #777777;  --search-border: transparent;
+  --inverse-bg:     #F2F2F2;  --inverse-text: #111111;
+  --btn2-bg:        #BDBDBD;  --btn2-hover: #D0D0D0;
+  --overlay-btn-bg: rgba(0, 0, 0, .45);
+  --badge-bg:       rgba(0, 0, 0, .35);
+  --promo-tint:     rgba(204, 255, 0, .10);
+  --mark:           #CCFF00;   --mark-fill: none;   --pin-fill: var(--bg);
+  --shadow-card:    none;
+
+  /* Как лайм ведёт себя в компонентах (в тёмной — сам лайм, в светлой — подложка-маркер) */
+  --accent-mark:    none;                     /* маркер под акцентным словом */
+  --link-line:      currentColor;  --link-thick: 1px;
+  --outline-border: var(--lime-line);  --outline-hover: var(--lime-soft);
+  --badge-accent-bg: var(--badge-bg);  --badge-accent-line: var(--lime-line);
+  --switch-on-bg:   var(--lime-soft);  --switch-on-line: var(--lime-line);  --switch-on-knob: var(--accent-fg);
+  --btn2-text:      var(--on-accent);
+  --stat-icon-bg:   transparent;  --stat-icon-size: 26px;  --stat-icon-pad: 0px;
+  --tab-active-bg:  transparent;
+
+  /* Эффекты */
+  --glow: 0 0 48px rgba(204, 255, 0, .14);
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-fg);
+}
+
+[data-theme] { color: var(--text); }
+
+/* Светлая тема. Лайм остаётся базовым цветом, но на белом он не читается как текст,
+   поэтому в светлой теме он работает подложкой-маркером: заливка кнопок и чипов, линия под
+   активной вкладкой и ссылкой, кружок под иконкой, маркер под акцентным словом.
+   Текст и иконки при этом чёрные. Нейтрали — чистые серые, без бежевого и зелёного оттенка. */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg:            #FFFFFF;
+  --surface:       #F3F3F3;
+  --surface-2:     #E8E8E8;
+  --field:         #FFFFFF;
+  --border:        #E3E3E3;
+  --border-strong: #8A8A8A;   /* ≥ 3:1 на белом — граница элементов управления */
+
+  --text:          #0D0D0D;
+  --text-2:        #4B4B4B;
+  --text-3:        #6A6A6A;
+  --on-accent:     #0D0D0D;
+
+  --lime:          #CCFF00;
+  --lime-hover:    #C1F200;
+  --lime-press:    #AEDB00;
+  --lime-soft:     rgba(204, 255, 0, .38);
+  --lime-line:     rgba(13, 13, 13, .32);
+  --accent-fg:     #0D0D0D;   /* «акцент как текст» в светлой теме — чёрный */
+  --deco:          #0D0D0D;
+
+  --success:       #0F7A44;
+  --warning:       #A94B00;
+  --danger:        #C42B2B;
+  --star:          #F5B301;
+
+  --topbar-bg:      rgba(255, 255, 255, .92);
+  --panel-bg:       #FFFFFF;
+  --search-bg:      #FFFFFF;  --search-text: #0D0D0D;  --search-ph: #6A6A6A;  --search-border: #8A8A8A;
+  --inverse-bg:     #0D0D0D;  --inverse-text: #FFFFFF;
+  --btn2-bg:        #0D0D0D;  --btn2-hover: #2B2B2B;
+  --overlay-btn-bg: rgba(255, 255, 255, .92);
+  --badge-bg:       rgba(255, 255, 255, .94);
+  --promo-tint:     rgba(204, 255, 0, .10);
+  --mark:           #0D0D0D;  --mark-fill: #CCFF00;  --pin-fill: #CCFF00;
+  --shadow-card:    0 1px 2px rgba(0, 0, 0, .05), 0 10px 28px rgba(0, 0, 0, .06);
+
+  --accent-mark:    linear-gradient(transparent 52%, var(--lime) 52%, var(--lime) 94%, transparent 94%);
+  --link-line:      var(--lime);  --link-thick: 3px;
+  --outline-border: #0D0D0D;      --outline-hover: var(--lime);
+  --badge-accent-bg: rgba(204, 255, 0, .5);  --badge-accent-line: rgba(13, 13, 13, .3);
+  --switch-on-bg:   var(--lime);  --switch-on-line: #0D0D0D;  --switch-on-knob: #0D0D0D;
+  --btn2-text:      #FFFFFF;
+  --stat-icon-bg:   var(--lime);  --stat-icon-size: 40px;  --stat-icon-pad: 9px;
+  --tab-active-bg:  var(--lime);
+
+  --glow: 0 10px 40px rgba(170, 220, 0, .35);
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px #0D0D0D;
+}
+
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 400 16px/1.5 var(--font); -webkit-font-smoothing: antialiased;
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; animation: none !important; } }
+a { color: inherit; }
+:focus-visible { outline: none; box-shadow: var(--ring); border-radius: var(--r-sm); }
+svg.i { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ============================================================
+   ОФОРМЛЕНИЕ ЭТОЙ СТРАНИЦЫ (не часть системы)
+   ============================================================ */
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 max(var(--s-4), env(safe-area-inset-left)) 0 max(var(--s-4), env(safe-area-inset-right)); }
+section.block, h3.sub { scroll-margin-top: 104px; }
+.topbar { position: sticky; top: 0; z-index: 10; background: var(--topbar-bg); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+.topbar .wrap { display: flex; align-items: center; gap: var(--s-4); height: 64px; }
+.topbar .logo { flex: none; }
+.topbar nav { display: flex; gap: 2px; margin-left: auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.topbar nav::-webkit-scrollbar { display: none; }
+.topbar nav a { text-decoration: none; color: var(--text-2); font-size: 14px; padding: 6px 8px; border-radius: var(--r-pill); white-space: nowrap; }
+.topbar nav a:hover { color: var(--text); background: var(--surface); }
+.hero { padding: var(--s-16) 0 var(--s-10); border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+.hero h1 { font-size: clamp(36px, 6vw, 64px); line-height: 1.05; font-weight: 800; letter-spacing: -.02em; margin: 0 0 var(--s-4); }
+.hero h1 em, .t-accent, .promo h4 em { font-style: normal; color: var(--accent-fg); background: var(--accent-mark); -webkit-box-decoration-break: clone; box-decoration-break: clone; padding: 0 .06em; }
+.deco { color: var(--deco); }
+.pinbody { fill: var(--pin-fill); }
+@media (max-width: 720px) { .hero .route { display: none; } }
+.hero p { color: var(--text-2); max-width: 640px; margin: 0; font-size: 18px; }
+.hero .route { position: absolute; right: 0; top: 10px; width: min(520px, 60vw); opacity: .9; pointer-events: none; }
+section.block { padding: var(--s-12) 0; border-bottom: 1px solid var(--border); }
+section.block > .wrap > h2 { font-size: 32px; line-height: 1.15; letter-spacing: -.01em; margin: 0 0 var(--s-2); font-weight: 700; }
+section.block > .wrap > p.lead { color: var(--text-2); margin: 0 0 var(--s-8); max-width: 720px; }
+h3.sub { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); font-weight: 600; margin: var(--s-8) 0 var(--s-4); }
+.grid { display: grid; gap: var(--s-4); }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.g4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); }
+.stage { background: var(--bg); border: 1px dashed var(--border-strong); border-radius: var(--r-lg); padding: var(--s-6); }
+.cap { font-size: 12px; color: var(--text-3); margin-top: var(--s-2); }
+code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; color: var(--text-2); }
+.note { border-left: 2px solid var(--lime); background: var(--lime-soft); padding: var(--s-3) var(--s-4); border-radius: 0 var(--r-md) var(--r-md) 0; font-size: 14px; color: var(--text-2); margin-top: var(--s-6); }
+.note b { color: var(--text); }
+
+/* ============================================================
+   КОМПОНЕНТЫ
+   ============================================================ */
+
+/* --- Логотип (текстовый макет: заменить оригинальным знаком) --- */
+.logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+.logo .mark { width: 30px; height: 30px; color: var(--mark); }
+.logo b { font-weight: 800; font-size: 15px; line-height: 1; letter-spacing: .06em; text-transform: uppercase; display: block; }
+
+/* --- Кнопки --- */
+.btn {
+  --h: 44px; --px: 20px;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  height: var(--h); padding: 0 var(--px); border-radius: var(--r-md);
+  font: 600 15px/1 var(--font); border: 1px solid transparent; cursor: pointer;
+  text-decoration: none; white-space: nowrap; transition: background .15s, border-color .15s, color .15s, transform .05s;
+}
+.btn:active { transform: translateY(1px); }
+.btn-sm { --h: 34px; --px: 14px; font-size: 13px; border-radius: var(--r-sm); }
+.btn-lg { --h: 52px; --px: 28px; font-size: 16px; }
+.btn-block { width: 100%; }
+.btn-primary { background: var(--lime); color: var(--on-accent); }
+.btn-primary:hover { background: var(--lime-hover); }
+.btn-primary:active { background: var(--lime-press); }
+.btn-outline { background: transparent; color: var(--accent-fg); border-color: var(--outline-border); }
+.btn-outline:hover { background: var(--outline-hover); border-color: var(--outline-border); }
+.btn-neutral { background: transparent; color: var(--text); border-color: var(--border-strong); }
+.btn-neutral:hover { background: var(--surface); border-color: #555; }
+.btn-secondary { background: var(--btn2-bg); color: var(--btn2-text); }
+.btn-secondary:hover { background: var(--btn2-hover); }
+.btn-ghost { background: transparent; color: var(--text-2); }
+.btn-ghost:hover { color: var(--text); background: var(--surface); }
+.btn[disabled], .btn.is-disabled { background: var(--surface-2); color: var(--text-3); border-color: transparent; cursor: not-allowed; }
+.btn.is-loading { pointer-events: none; }
+.btn.is-loading::before { content: ""; width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn.is-focus { box-shadow: var(--ring); }
+.btn-icon { --px: 0; width: var(--h); border-radius: var(--r-pill); background: var(--overlay-btn-bg); color: var(--text); border-color: var(--border-strong); }
+.btn-icon:hover { background: var(--surface); }
+.btn-icon.on { color: var(--accent-fg); border-color: var(--lime-line); }
+.link, .check a { color: var(--accent-fg); text-decoration: underline; text-decoration-color: var(--link-line); text-decoration-thickness: var(--link-thick); text-underline-offset: 3px; }
+
+/* --- Поля --- */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > label { font-size: 13px; color: var(--text-2); }
+.input {
+  height: 44px; width: 100%; padding: 0 14px; background: var(--field); color: var(--text);
+  border: 1px solid var(--border-strong); border-radius: var(--r-sm); font: 400 15px var(--font);
+}
+.input::placeholder { color: var(--text-3); }
+.input:hover { border-color: #555; }
+.input:focus { outline: none; border-color: var(--accent-fg); box-shadow: 0 0 0 3px var(--lime-soft); }
+.input.is-error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(255,92,92,.14); }
+.input:disabled { opacity: .5; cursor: not-allowed; }
+.hint { font-size: 12px; color: var(--text-3); }
+.hint.err { color: var(--danger); }
+.input-wrap { position: relative; }
+.input-wrap .input { padding-right: 44px; }
+.input-wrap .end { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: var(--text-2); background: none; border: 0; padding: 6px; cursor: pointer; }
+.code { display: flex; gap: 10px; }
+.code span { width: 44px; height: 48px; display: grid; place-items: center; background: var(--field); border: 1px solid var(--border-strong); border-radius: var(--r-sm); font-size: 20px; font-weight: 600; }
+.code span.on { border-color: var(--accent-fg); box-shadow: 0 0 0 3px var(--lime-soft); }
+.search { display: flex; height: 48px; border-radius: var(--r-sm); overflow: hidden; background: var(--search-bg); border: 1px solid var(--search-border); }
+.search input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 0 16px; font: 400 15px var(--font); color: var(--search-text); }
+.search input::placeholder { color: var(--search-ph); }
+.search input:focus { outline: none; }
+.search button { width: 52px; border: 0; background: var(--lime); color: var(--on-accent); display: grid; place-items: center; cursor: pointer; }
+.search button:hover { background: var(--lime-hover); }
+.check { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--text-2); cursor: pointer; }
+.check input { appearance: none; width: 18px; height: 18px; margin: 2px 0 0; flex: none; border: 1px solid var(--border-strong); border-radius: 4px; background: var(--field); display: grid; place-items: center; cursor: pointer; }
+.check input:checked { background: var(--lime); border-color: var(--lime); }
+.check input:checked::after { content: ""; width: 9px; height: 5px; border: 2px solid var(--on-accent); border-top: 0; border-right: 0; transform: rotate(-45deg) translate(1px, -1px); }
+.check input:focus-visible { box-shadow: var(--ring); }
+.switch { position: relative; width: 44px; height: 26px; }
+.switch input { appearance: none; position: absolute; inset: 0; margin: 0; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: var(--r-pill); cursor: pointer; transition: background .15s; }
+.switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--text-2); transition: transform .15s, background .15s; }
+.switch input:checked { background: var(--switch-on-bg); border-color: var(--switch-on-line); }
+.switch input:checked::after { transform: translateX(18px); background: var(--switch-on-knob); }
+
+/* --- Фильтр-чипы, вкладки, сегменты --- */
+.chip {
+  display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px;
+  border-radius: var(--r-pill); border: 1px solid var(--border-strong); background: transparent;
+  color: var(--text); font: 500 14px var(--font); cursor: pointer; white-space: nowrap;
+}
+.chip:hover { background: var(--surface); }
+.chip .i { width: 18px; height: 18px; color: var(--accent-fg); }
+.chip.active { background: var(--lime); border-color: var(--lime); color: var(--on-accent); font-weight: 600; }
+.chip.active .i { color: var(--on-accent); }
+.chip-sm { height: 32px; padding: 0 12px; font-size: 13px; }
+.chip.inverse { background: var(--inverse-bg); color: var(--inverse-text); border-color: transparent; }
+.chip.tag { background: var(--surface); border-color: var(--border); font-size: 13px; }
+.chip.tag .i { color: var(--text-3); width: 14px; height: 14px; cursor: pointer; }
+.tabs { display: flex; gap: var(--s-6); border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tabs a { position: relative; padding: 12px 0; text-decoration: none; color: var(--text-2); font-size: 15px; white-space: nowrap; }
+.tabs a:hover { color: var(--text); }
+.tabs a.active { color: var(--accent-fg); }
+.tabs a.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--lime); border-radius: 2px; }
+.segment { display: inline-flex; padding: 3px; border: 1px solid var(--border-strong); border-radius: var(--r-md); }
+.segment button { height: 34px; padding: 0 16px; border: 0; background: transparent; color: var(--text); font: 500 14px var(--font); border-radius: 8px; cursor: pointer; }
+.segment button.active { background: var(--lime); color: var(--on-accent); font-weight: 600; }
+.pager { display: flex; gap: 8px; align-items: center; }
+.pager a { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; text-decoration: none; color: var(--text-2); font-size: 14px; border: 1px solid var(--border-strong); }
+.pager a.active { background: var(--lime); border-color: var(--lime); color: var(--on-accent); font-weight: 600; }
+
+/* --- Бейджи и метки --- */
+.badge { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: var(--r-xs); font: 600 11px/1 var(--font); letter-spacing: .02em; border: 1px solid transparent; white-space: nowrap; }
+.badge.new { background: var(--lime); color: var(--on-accent); text-transform: uppercase; }
+.badge.accent { color: var(--accent-fg); border-color: var(--badge-accent-line); background: var(--badge-accent-bg); }
+.badge.pill { border-radius: var(--r-pill); }
+.badge.warm { color: var(--warning); border-color: rgba(255,154,61,.55); background: var(--badge-bg); }
+.badge.ok { color: var(--success); border-color: rgba(61,220,132,.55); background: var(--badge-bg); }
+.badge.mute { color: var(--text-2); border-color: var(--border-strong); background: var(--badge-bg); }
+.badge .i { width: 12px; height: 12px; }
+.rating { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.rating .i { width: 14px; height: 14px; fill: var(--star); stroke: var(--star); }
+.rating span { color: var(--text-3); }
+.meta { font-size: 12.5px; color: var(--text-3); }
+
+/* --- Карточки --- */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-card); }
+.ph { position: relative; aspect-ratio: 4 / 3; background:
+  radial-gradient(120% 90% at 20% 15%, rgba(255,170,80,.30), transparent 55%),
+  radial-gradient(90% 90% at 85% 90%, rgba(204,255,0,.10), transparent 60%),
+  linear-gradient(160deg, #2a221b, #0f0d0b 70%); }
+.ph.b { background:
+  radial-gradient(100% 80% at 70% 20%, rgba(120,160,255,.22), transparent 55%),
+  linear-gradient(200deg, #1a2030, #0b0d12 75%); }
+.ph.c { background:
+  radial-gradient(90% 90% at 30% 80%, rgba(255,120,80,.22), transparent 55%),
+  linear-gradient(170deg, #2a1c1c, #0d0909 75%); }
+.ph .tl { position: absolute; left: 10px; top: 10px; display: flex; gap: 6px; }
+.ph .tr { position: absolute; right: 10px; top: 10px; }
+.card .body { padding: var(--s-3) var(--s-4) var(--s-4); display: flex; flex-direction: column; gap: 4px; }
+.card h4 { margin: 0; font-size: 17px; line-height: 1.25; font-weight: 600; }
+.card .row-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.tile { color: #fff; position: relative; border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--border); aspect-ratio: 5 / 4; display: flex; align-items: flex-end; }
+.tile .ph { position: absolute; inset: 0; aspect-ratio: auto; }
+.tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,.05) 60%); }
+.tile .txt { position: relative; z-index: 1; padding: var(--s-3) var(--s-4); }
+.tile .txt b { display: block; font-size: 17px; font-weight: 600; }
+.tile .txt b { color: #fff; }
+.tile .txt span { font-size: 13px; color: rgba(255,255,255,.78); }
+.tile .txt .badge { display: inline-flex; font-size: 11px; color: var(--on-accent); }
+.datebox { width: 44px; text-align: center; border-radius: var(--r-sm); background: var(--lime); color: var(--on-accent); padding: 4px 0; line-height: 1.05; }
+.datebox b { display: block; font-size: 17px; font-weight: 800; }
+.datebox span { font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.ico { padding: var(--s-4); display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.ico svg { width: 24px; height: 24px; color: var(--text); }
+.stat { padding: var(--s-4); display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.stat .i { width: var(--stat-icon-size); height: var(--stat-icon-size); padding: var(--stat-icon-pad); border-radius: 50%; background: var(--stat-icon-bg); color: var(--accent-fg); }
+.stat b { font-size: 26px; line-height: 1.1; font-weight: 700; }
+.stat span { font-size: 13px; color: var(--text-2); }
+.panel { background: var(--panel-bg); border: 1px solid var(--border); border-radius: var(--r-lg); padding: var(--s-5); }
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.list li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--border); font-size: 14px; }
+.list li:first-child { border-top: 0; padding-top: 0; }
+.list .i { color: var(--text-2); margin-top: 1px; }
+.list small { display: block; color: var(--text-3); font-size: 12.5px; }
+.promo { position: relative; overflow: hidden; border: 1px solid var(--lime-line); border-radius: var(--r-lg); padding: var(--s-6); background: radial-gradient(120% 140% at 0% 0%, var(--promo-tint), transparent 55%), var(--bg); box-shadow: var(--glow); display: grid; gap: var(--s-4); }
+.promo h4 { margin: 0; font-size: 26px; font-weight: 700; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.promo p { margin: 0; color: var(--text-2); font-size: 14px; }
+.promo .sparks { position: absolute; right: 18px; top: 10px; width: 120px; opacity: .85; pointer-events: none; }
+.promo .search { max-width: 640px; }
+.promo .lock { display: flex; gap: 6px; align-items: center; color: var(--text-3); font-size: 12px; }
+.promo .lock .i { width: 14px; height: 14px; }
+
+/* --- Навигация --- */
+.header { display: flex; align-items: center; gap: var(--s-6); height: 64px; padding: 0 var(--s-6); background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-lg); overflow-x: auto; }
+.header .city { display: inline-flex; align-items: center; gap: 6px; color: var(--text-2); font-size: 14px; white-space: nowrap; }
+.header nav { display: flex; gap: var(--s-6); margin: 0 auto; }
+.header nav a { position: relative; text-decoration: none; color: var(--text); font-size: 15px; padding: 21px 0; white-space: nowrap; }
+.header nav a.active { color: var(--accent-fg); }
+.header nav a.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--lime); border-radius: 2px; }
+.tabbar { display: grid; grid-template-columns: repeat(5, 1fr); max-width: 390px; padding: 8px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--r-xl); }
+.tabbar a { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; text-decoration: none; font-size: 11px; color: var(--text-2); border-radius: var(--r-md); }
+.tabbar a.active { color: var(--accent-fg); font-weight: 600; }
+.tabbar a.active .i { fill: var(--accent-fg); background: var(--tab-active-bg); width: 44px; height: 30px; padding: 4px 10px; border-radius: var(--r-pill); }
+.sidebar { width: 240px; padding: var(--s-4); border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg); display: flex; flex-direction: column; gap: 4px; }
+.sidebar a { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: var(--r-md); text-decoration: none; font-size: 15px; color: var(--text); }
+.sidebar a:hover { background: var(--surface); }
+.sidebar a.active { background: var(--lime); color: var(--on-accent); font-weight: 600; }
+.crumbs { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--text-3); }
+.crumbs b { color: var(--text-2); font-weight: 500; }
+.footer { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: var(--s-8); padding: var(--s-8) var(--s-6); border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg); }
+.footer h5 { margin: 0 0 var(--s-3); font-size: 15px; font-weight: 600; }
+.footer a.logo { display: inline-flex; padding: 0; color: var(--text); }
+.footer a { display: block; text-decoration: none; color: var(--text-2); font-size: 14px; padding: 4px 0; }
+.footer a:hover { color: var(--text); }
+.footer p { color: var(--text-3); font-size: 13px; margin: var(--s-3) 0; max-width: 260px; }
+.soc { display: flex; gap: 10px; }
+@media (max-width: 720px) { .footer { grid-template-columns: 1fr 1fr; } }
+
+/* --- Переключатель темы и демо двух тем --- */
+.theme-switch { display: inline-flex; padding: 3px; border: 1px solid var(--border-strong); border-radius: var(--r-pill); flex: none; }
+.theme-switch button { height: 30px; padding: 0 14px; border: 0; background: transparent; color: var(--text-2); font: 500 13px var(--font); border-radius: var(--r-pill); cursor: pointer; white-space: nowrap; }
+.theme-switch button[aria-pressed="true"] { background: var(--lime); color: var(--on-accent); font-weight: 600; }
+.theme-demo { background: var(--bg); color: var(--text); border: 1px solid var(--border-strong); border-radius: var(--r-lg); padding: var(--s-6); }
+
+/* --- Токены: витрина --- */
+.sw { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: var(--surface); }
+.sw i { display: block; height: 76px; border-bottom: 1px solid var(--border); }
+.sw div { padding: 10px 14px 12px; }
+.sw b { display: block; font-size: 14px; font-weight: 600; }
+.sw code { display: block; margin-top: 2px; }
+.sw small { color: var(--text-3); font-size: 12px; }
+.type-row { display: grid; grid-template-columns: 170px 1fr; gap: var(--s-6); align-items: baseline; padding: var(--s-5) 0; border-top: 1px solid var(--border); }
+.type-row:first-child { border-top: 0; }
+.type-row .k { color: var(--text-3); font-size: 12.5px; }
+.type-row .k b { display: block; color: var(--text); font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.t-display { font-size: clamp(36px, 6vw, 56px); line-height: 1.05; font-weight: 800; letter-spacing: -.02em; }
+.t-h1 { font-size: 40px; line-height: 1.1; font-weight: 700; letter-spacing: -.015em; }
+.t-h2 { font-size: 28px; line-height: 1.2; font-weight: 700; }
+.t-h3 { font-size: 20px; line-height: 1.3; font-weight: 600; }
+.t-body-l { font-size: 16px; line-height: 1.55; }
+.t-body { font-size: 14px; line-height: 1.5; color: var(--text-2); }
+.t-cap { font-size: 12px; line-height: 1.4; color: var(--text-3); }
+.t-over { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; color: var(--accent-fg); }
+@media (max-width: 640px) { .type-row { grid-template-columns: 1fr; gap: 6px; } }
+.scale div { display: flex; align-items: center; gap: var(--s-4); margin-bottom: var(--s-2); }
+.scale i { display: block; height: 16px; outline: 1px solid var(--border-strong); background: var(--lime); border-radius: 3px; opacity: .9; }
+.scale span { font-size: 12.5px; color: var(--text-2); width: 100px; }
+.radii div { width: 96px; height: 96px; background: var(--surface); border: 1px solid var(--border-strong); display: grid; place-items: center; font-size: 12px; color: var(--text-2); text-align: center; }
+.glowbox { height: 96px; border-radius: var(--r-lg); border: 1px solid var(--lime-line); box-shadow: var(--glow); display: grid; place-items: center; color: var(--text-2); font-size: 13px; }
+.states { display: grid; grid-template-columns: 120px repeat(auto-fit, minmax(130px, 1fr)); gap: var(--s-3) var(--s-4); align-items: center; }
+.states .h { font-size: 12px; color: var(--text-3); }
+
+/* ============================================================
+   МОБИЛЬНАЯ АДАПТАЦИЯ
+   ============================================================ */
+@media (max-width: 720px) {
+  .topbar .wrap { flex-wrap: wrap; height: auto; gap: 0 var(--s-3); padding-top: 8px; padding-bottom: 0; justify-content: space-between; }
+  .topbar .logo b { font-size: 13px; }
+  .topbar .logo .mark { width: 26px; height: 26px; }
+  .topbar nav { order: 3; flex: 0 0 100%; margin: 6px calc(-1 * var(--s-4)) 0; padding: 0 var(--s-4); gap: 4px; border-top: 1px solid var(--border); -webkit-overflow-scrolling: touch; }
+  .topbar nav a { padding: 11px 10px; font-size: 14px; border-radius: 0; }
+  .hero { padding: var(--s-10) 0 var(--s-8); }
+  .hero p { font-size: 16px; }
+  section.block { padding: var(--s-8) 0; }
+  section.block > .wrap > h2 { font-size: 26px; }
+  section.block > .wrap > p.lead { margin-bottom: var(--s-6); }
+  h3.sub { margin: var(--s-6) 0 var(--s-3); }
+  .stage, .theme-demo { padding: var(--s-4); }
+  .g2, .g3 { grid-template-columns: 1fr; }
+  .g4 { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .sw i { height: 56px; }
+  .sw div { padding: 8px 10px 10px; }
+  .sw code { overflow-wrap: anywhere; font-size: 11.5px; }
+  .sw small { display: block; line-height: 1.35; }
+  .t-h1 { font-size: 32px; }
+  .t-h2 { font-size: 24px; }
+  .states { grid-template-columns: 76px repeat(6, 128px); overflow-x: auto; -webkit-overflow-scrolling: touch; gap: var(--s-3); }
+  .header { gap: var(--s-4); padding: 0 var(--s-4); }
+  .sidebar { width: 100%; }
+  .footer { grid-template-columns: 1fr 1fr; gap: var(--s-6); padding: var(--s-6) var(--s-4); }
+  .footer > :first-child { grid-column: 1 / -1; }
+  .footer p { max-width: none; }
+  .code { gap: 6px; }
+  .code span { flex: 1 1 0; width: auto; max-width: 48px; }
+  .note { font-size: 13.5px; }
+  .tabbar { max-width: none; }
+  #iconGrid { gap: var(--s-3) !important; }
+  .ico { padding: var(--s-3) 4px; }
+  .promo { padding: var(--s-5) var(--s-4); }
+  .promo h4 { font-size: 22px; }
+  .promo .sparks { width: 64px; right: 8px; top: 6px; opacity: .55; }
+}
+@media (max-width: 380px) {
+  .g4 { grid-template-columns: 1fr 1fr; }
+  .theme-switch button { padding: 0 11px; }
+}
+@media (pointer: coarse) {
+  .btn-sm { --h: 40px; }
+  .chip-sm, .chip { min-height: 40px; }
+  .chip-sm { height: 40px; }
+  .theme-switch button { height: 36px; }
+  .pager a { width: 40px; height: 40px; }
+  .sidebar a, .footer a { padding-top: 12px; padding-bottom: 12px; }
+  .footer a { padding-top: 9px; padding-bottom: 9px; }
+  .check input { width: 22px; height: 22px; margin-top: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ Набор иконок (контурные, 24×24, штрих 1.75) ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-9.2C1.6 7.3 3.7 4 7 4c2 0 3.7 1.2 5 3 1.3-1.8 3-3 5-3 3.3 0 5.4 3.300 4 6.800C19 15.600 12 20 12 20z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.500 4.500"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.500-5.800-6.500-11a6.500 6.500 0 0 1 13 0c0 5.200-6.500 11-6.500 11z"/><circle cx="12" cy="10" r="2.300"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.500 2.600 5.400 5.900.8-4.300 4.100 1 5.900-5.200-2.800-5.200 2.800 1-5.900-4.300-4.100 5.900-.8z"/></symbol>
+  <symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-arrow-l" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+  <symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.500 4.500 4.500L19 7.500"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.500" y="5" width="17" height="15.500" rx="2.500"/><path d="M3.500 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.500"/><path d="M12 7.500V12l3 2"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.500"/><circle cx="18" cy="6" r="2.500"/><circle cx="18" cy="18" r="2.500"/><path d="m8.200 10.800 7.600-3.600M8.200 13.200l7.600 3.600"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6.500 4h11v16.500L12 16.500l-5.500 4z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.500" r="3.800"/><path d="M4.500 20c.8-3.700 3.900-5.500 7.500-5.500s6.700 1.800 7.500 5.500"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9h-5.500v-5.500h-5V20H4z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><rect x="4" y="3.500" width="16" height="17" rx="2.500"/><path d="M8 8.500h8M8 12.500h8M8 16.500h5"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.500 12S6 5.500 12 5.500 21.500 12 21.500 12 18 18.500 12 18.500 2.500 12 2.500 12z"/><circle cx="12" cy="12" r="2.800"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.500" width="14" height="10" rx="2.500"/><path d="M8 10.500V8a4 4 0 0 1 8 0v2.500"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.500 5 6v5.500c0 4.400 3 7.700 7 9 4-1.300 7-4.600 7-9V6z"/><path d="m9 12 2.200 2.200L15.500 10"/></symbol>
+  <symbol id="i-crown" viewBox="0 0 24 24"><path d="m4 8 4.500 4L12 6l3.500 6L20 8l-1.500 10h-13z"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.400-5.700M20 4v4.500h-4.500"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3c.6 4.500 2.500 6.400 7 7-4.500.6-6.400 2.500-7 7-.6-4.500-2.500-6.400-7-7 4.500-.6 6.400-2.500 7-7z"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12 20 4l-4.500 16-3.500-6.500z"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+  <symbol id="i-plane" viewBox="0 0 24 24"><path d="M3 12 21 4l-6 16-3-7z"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.500M12 18.500V21M3 12h2.500M18.500 12H21M5.600 5.600l1.800 1.800M16.600 16.600l1.800 1.800M5.600 18.400l1.800-1.800M16.600 7.400l1.800-1.800"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.500h6V7M6.500 7l1 13h9l1-13"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.800 2.800 0 0 0-4-4L4 16z"/></symbol>
+  <symbol id="i-logo" viewBox="0 0 32 32"><path d="M16 29S6 20.500 6 12.500a10 10 0 0 1 20 0C26 20.500 16 29 16 29z" style="fill:var(--mark-fill)" stroke="currentColor" stroke-width="2.200" stroke-linejoin="round"/><path d="m16 8.500 1.800 3.600 4 .6-2.900 2.800.7 4L16 17.500l-3.600 2 .7-4-2.900-2.800 4-.6z" fill="currentColor"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Местами вкусно"><svg class="mark i" style="stroke:none"><use href="#i-logo"/></svg><b>Местами<br>вкусно</b></a>
+    <nav aria-label="Разделы страницы">
+      <a href="#colors">Цвета</a><a href="#themes">Темы</a><a href="#type">Типографика</a><a href="#space">Форма</a>
+      <a href="#buttons">Кнопки</a><a href="#forms">Поля</a><a href="#filters">Фильтры</a>
+      <a href="#badges">Бейджи</a><a href="#cards">Карточки</a><a href="#nav">Навигация</a><a href="#icons">Иконки</a>
+    </nav>
+    <div class="theme-switch" role="group" aria-label="Тема оформления">
+      <button type="button" data-set-theme="dark" aria-pressed="true">Тёмная</button>
+      <button type="button" data-set-theme="light" aria-pressed="false">Светлая</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<div class="hero">
+  <div class="wrap">
+    <p class="t-over" style="margin:0 0 12px">Каркас дизайна · версия 0.1</p>
+    <h1>Дизайн-система<br><em>Местами вкусно</em></h1>
+    <p>Токены, типографика и базовые компоненты в одном файле. Без контекста приложения: только нейтральные подписи, чтобы видеть форму, цвет и состояния.</p>
+  </div>
+  <svg class="route deco" viewBox="0 0 540 200" fill="none" aria-hidden="true">
+    <path d="M10 170C90 190 150 110 230 120s120 60 170 0 60-90 105-70" stroke="currentColor" stroke-width="1.500" stroke-dasharray="5 7" stroke-linecap="round"/>
+    <circle cx="10" cy="170" r="6" stroke="currentColor" stroke-width="2"/>
+    <path d="M505 8c-10 0-17 7.500-17 17 0 12 17 27 17 27s17-15 17-27c0-9.500-7-17-17-17z" class="pinbody" stroke="currentColor" stroke-width="2"/><circle cx="505" cy="25" r="5" fill="currentColor"/>
+    <path d="M330 60c1.500 11 6 15.500 17 17-11 1.500-15.500 6-17 17-1.500-11-6-15.500-17-17 11-1.500 15.500-6 17-17z" fill="currentColor"/>
+  </svg>
+</div>
+
+<!-- ============ ЦВЕТА ============ -->
+<section class="block" id="colors"><div class="wrap">
+  <h2>Цвета</h2>
+  <p class="lead">Основная тема тёмная, с одним акцентом. Лаймовый — только для действий, активных состояний и выделения, не как фон целых экранов. Светлая тема — на тех же токенах, см. блок «Тёмная и светлая тема».</p>
+
+  <h3 class="sub">Основа</h3>
+  <div class="grid g4">
+    <div class="sw"><i style="background:var(--bg)"></i><div><b>Фон</b><code data-token="--bg"></code><small>Основной фон страниц</small></div></div>
+    <div class="sw"><i style="background:var(--surface)"></i><div><b>Поверхность</b><code data-token="--surface"></code><small>Карточки, панели</small></div></div>
+    <div class="sw"><i style="background:var(--surface-2)"></i><div><b>Поверхность 2</b><code data-token="--surface-2"></code><small>Наведение, вложенные блоки</small></div></div>
+    <div class="sw"><i style="background:var(--field)"></i><div><b>Поле ввода</b><code data-token="--field"></code><small>Инпуты, селекты</small></div></div>
+    <div class="sw"><i style="background:var(--border)"></i><div><b>Граница</b><code data-token="--border"></code><small>Разделители, карточки</small></div></div>
+    <div class="sw"><i style="background:var(--border-strong)"></i><div><b>Граница элемента</b><code data-token="--border-strong"></code><small>Кнопки, поля, чипы</small></div></div>
+  </div>
+
+  <h3 class="sub">Текст</h3>
+  <div class="grid g4">
+    <div class="sw"><i style="background:var(--text)"></i><div><b>Основной</b><code data-token="--text"></code><small>Заголовки, основной текст</small></div></div>
+    <div class="sw"><i style="background:var(--text-2)"></i><div><b>Вторичный</b><code data-token="--text-2"></code><small>Описания, меню</small></div></div>
+    <div class="sw"><i style="background:var(--text-3)"></i><div><b>Подписи</b><code data-token="--text-3"></code><small>Подсказки, метаданные</small></div></div>
+    <div class="sw"><i style="background:var(--on-accent)"></i><div><b>Текст на акценте</b><code data-token="--on-accent"></code><small>Внутри лаймовых кнопок</small></div></div>
+  </div>
+
+  <h3 class="sub">Акцент</h3>
+  <div class="grid g4">
+    <div class="sw"><i style="background:var(--lime)"></i><div><b>Лайм</b><code data-token="--lime"></code><small>Главное действие, активное</small></div></div>
+    <div class="sw"><i style="background:var(--lime-hover)"></i><div><b>Лайм: наведение</b><code data-token="--lime-hover"></code><small>Состояние hover</small></div></div>
+    <div class="sw"><i style="background:var(--lime-press)"></i><div><b>Лайм: нажатие</b><code data-token="--lime-press"></code><small>Состояние pressed</small></div></div>
+    <div class="sw"><i style="background:var(--accent-fg)"></i><div><b>Лайм как текст</b><code data-token="--accent-fg"></code><small>Ссылки, иконки, активные пункты. В светлой теме — чёрный, лайм уходит в подложку</small></div></div>
+    <div class="sw"><i style="background:var(--lime-soft);"></i><div><b>Лайм: подложка</b><code data-token="--lime-soft"></code><small>Фон выделения, фокус поля</small></div></div>
+    <div class="sw"><i style="background:var(--lime-line);"></i><div><b>Лайм: контур</b><code data-token="--lime-line"></code><small>Контурные кнопки и бейджи</small></div></div>
+  </div>
+
+  <h3 class="sub">Семантика</h3>
+  <div class="grid g4">
+    <div class="sw"><i style="background:var(--success)"></i><div><b>Успех</b><code data-token="--success"></code><small>«Бесплатно», подтверждено</small></div></div>
+    <div class="sw"><i style="background:var(--warning)"></i><div><b>Внимание</b><code data-token="--warning"></code><small>«Осталось мало»</small></div></div>
+    <div class="sw"><i style="background:var(--danger)"></i><div><b>Ошибка</b><code data-token="--danger"></code><small>Ошибки, удаление</small></div></div>
+    <div class="sw"><i style="background:var(--star)"></i><div><b>Звезда рейтинга</b><code data-token="--star"></code><small>Только для оценок</small></div></div>
+  </div>
+
+  <div class="note"><b>Откуда значения.</b> Тёмные цвета взяты из ТЗ (§25А.1: фон #0D0D0D, поверхности около #1A1A1A, акцент лайм #CCFF00). На референсах измерено: фон темнее (≈ #050505–#0D0D0D), лайм чуть приглушённее (≈ #C8E600). Если нужно совпадение с референсами, меняется только токен <code>--lime</code>. Светлая тема в референсах отсутствует: она построена вокруг того, что лайм остаётся базовым цветом (подложка-маркер), а текст чёрный; значения в карточках выше показывают текущую тему (переключатель вверху).</div>
+</div></section>
+
+
+<!-- ============ ДВЕ ТЕМЫ РЯДОМ ============ -->
+<section class="block" id="themes"><div class="wrap">
+  <h2>Тёмная и светлая тема</h2>
+  <p class="lead">Основная тема — тёмная (так в ТЗ). Светлая строится теми же токенами: меняются только значения, разметка и компоненты те же. Тема переключается атрибутом <code>data-theme="light"</code> на <code>&lt;html&gt;</code> или на любом блоке.</p>
+
+  <div class="grid g2">
+    <div class="theme-demo" data-theme="dark">
+      <p class="t-over" style="margin:0 0 12px">Тёмная</p>
+      <div class="row" style="margin-bottom:14px"><button class="btn btn-primary">Главное действие</button><button class="btn btn-outline">Контурная</button><button class="btn btn-neutral">Нейтральная</button></div>
+      <div class="field" style="margin-bottom:14px"><label>Поле</label><input class="input" placeholder="Подсказка в поле"></div>
+      <div class="row" style="margin-bottom:14px"><span class="chip active">Все</span><span class="chip">Вариант</span><span class="badge new">Новое</span><span class="badge accent">Метка</span><span class="badge ok">Успех</span><span class="badge warm">Внимание</span></div>
+      <article class="card" style="max-width:280px"><div class="ph"></div><div class="body"><h4>Заголовок карточки</h4><span class="meta">Категория · Район</span><div class="row-meta"><span class="rating"><svg class="i"><use href="#i-star"/></svg>4.7 <span>(1287)</span></span></div></div></article>
+      <p style="margin:14px 0 0"><a class="link" href="#themes">Ссылка</a> <span class="t-body">и вторичный текст</span></p>
+    </div>
+    <div class="theme-demo" data-theme="light">
+      <p class="t-over" style="margin:0 0 12px">Светлая</p>
+      <div class="row" style="margin-bottom:14px"><button class="btn btn-primary">Главное действие</button><button class="btn btn-outline">Контурная</button><button class="btn btn-neutral">Нейтральная</button></div>
+      <div class="field" style="margin-bottom:14px"><label>Поле</label><input class="input" placeholder="Подсказка в поле"></div>
+      <div class="row" style="margin-bottom:14px"><span class="chip active">Все</span><span class="chip">Вариант</span><span class="badge new">Новое</span><span class="badge accent">Метка</span><span class="badge ok">Успех</span><span class="badge warm">Внимание</span></div>
+      <article class="card" style="max-width:280px"><div class="ph"></div><div class="body"><h4>Заголовок карточки</h4><span class="meta">Категория · Район</span><div class="row-meta"><span class="rating"><svg class="i"><use href="#i-star"/></svg>4.7 <span>(1287)</span></span></div></div></article>
+      <p style="margin:14px 0 0"><a class="link" href="#themes">Ссылка</a> <span class="t-body">и вторичный текст</span></p>
+    </div>
+  </div>
+
+  <h3 class="sub">Как лайм работает в светлой теме</h3>
+  <div class="grid g3">
+    <div class="panel"><b>Заливка остаётся лаймом.</b><p class="t-body" style="margin:6px 0 0">Кнопки, активные чипы, метка «Новое», пагинация, выбранный переключатель — лайм с чёрным текстом в обеих темах (16.5:1).</p></div>
+    <div class="panel"><b>Вместо лайм-текста — маркер.</b><p class="t-body" style="margin:6px 0 0">Лайм на белом не читается (1.2:1), поэтому текст и иконки чёрные, а лайм стоит под ними: толстое подчёркивание у ссылок, линия под активной вкладкой, кружок под иконкой, маркер под акцентным словом.</p></div>
+    <div class="panel"><b>Чёрное — второй цвет бренда.</b><p class="t-body" style="margin:6px 0 0">Второстепенная кнопка — чёрная заливка, контурная — чёрный контур, блок ИИ — тёмный остров с лаймом. Нейтрали серые, без бежевого и зелёного оттенка.</p></div>
+  </div>
+  <div class="note"><b>Контраст текста (WCAG).</b> Светлая тема: основной 19.4:1, вторичный 8.7:1, подписи 5.4:1 на белом (4.9:1 на карточке), статусы (успех, внимание, ошибка) ≥ 4.9:1, граница элементов ≈ 3.2:1. Тёмная: вторичный 9.8:1, подписи 5.2:1 на карточке, лайм 16.5:1. Тема по умолчанию — тёмная и не зависит от настроек системы; выбор пользователя запоминается в браузере.</div>
+</div></section>
+
+<!-- ============ ТИПОГРАФИКА ============ -->
+<section class="block" id="type"><div class="wrap">
+  <h2>Типографика</h2>
+  <p class="lead">Гротеск без засечек с кириллицей (Inter — предположение по референсам, заменяется одной переменной <code>--font</code>). Заголовки плотные и жирные, текст спокойный. Ключевое слово в заголовке можно выделить лаймом.</p>
+
+  <div>
+    <div class="type-row"><div class="k"><b>Display</b>56 / 1.05 · 800</div><div class="t-display">Открывайте <span class="t-accent">вкусный</span> город</div></div>
+    <div class="type-row"><div class="k"><b>H1</b>40 / 1.1 · 700</div><div class="t-h1">Заголовок страницы</div></div>
+    <div class="type-row"><div class="k"><b>H2</b>28 / 1.2 · 700</div><div class="t-h2">Заголовок раздела</div></div>
+    <div class="type-row"><div class="k"><b>H3</b>20 / 1.3 · 600</div><div class="t-h3">Заголовок блока или карточки</div></div>
+    <div class="type-row"><div class="k"><b>Основной крупный</b>16 / 1.55 · 400</div><div class="t-body-l">Основной текст для описаний и лидов. Строка не длиннее 70–80 знаков, чтобы читалось легко.</div></div>
+    <div class="type-row"><div class="k"><b>Основной</b>14 / 1.5 · 400</div><div class="t-body">Вторичный текст: описания в карточках, подсказки, пояснения к элементам управления.</div></div>
+    <div class="type-row"><div class="k"><b>Подпись</b>12 / 1.4 · 400</div><div class="t-cap">Подпись, метаданные, юридическая мелочь</div></div>
+    <div class="type-row"><div class="k"><b>Надзаголовок</b>12 · 600 · капс</div><div class="t-over">Раздел · метка</div></div>
+  </div>
+</div></section>
+
+<!-- ============ ФОРМА И ОТСТУПЫ ============ -->
+<section class="block" id="space"><div class="wrap">
+  <h2>Форма и отступы</h2>
+  <p class="lead">Шаг сетки 4 px. Скругления растут с размером элемента: у кнопок и полей небольшие, у карточек крупные, у чипов и круглых кнопок полные.</p>
+
+  <div class="grid g2">
+    <div>
+      <h3 class="sub" style="margin-top:0">Отступы</h3>
+      <div class="scale">
+        <div><span>4 · --s-1</span><i style="width:4px"></i></div>
+        <div><span>8 · --s-2</span><i style="width:8px"></i></div>
+        <div><span>12 · --s-3</span><i style="width:12px"></i></div>
+        <div><span>16 · --s-4</span><i style="width:16px"></i></div>
+        <div><span>24 · --s-6</span><i style="width:24px"></i></div>
+        <div><span>32 · --s-8</span><i style="width:32px"></i></div>
+        <div><span>48 · --s-12</span><i style="width:48px"></i></div>
+        <div><span>64 · --s-16</span><i style="width:64px"></i></div>
+      </div>
+    </div>
+    <div>
+      <h3 class="sub" style="margin-top:0">Скругления</h3>
+      <div class="row radii">
+        <div style="border-radius:var(--r-xs)">4<br>--r-xs<br>бейдж</div>
+        <div style="border-radius:var(--r-sm)">6<br>--r-sm<br>поле</div>
+        <div style="border-radius:var(--r-md)">10<br>--r-md<br>кнопка</div>
+        <div style="border-radius:var(--r-lg)">16<br>--r-lg<br>карточка</div>
+        <div style="border-radius:var(--r-xl)">24<br>--r-xl<br>панель</div>
+        <div style="border-radius:var(--r-pill)">∞<br>--r-pill<br>чип</div>
+      </div>
+      <h3 class="sub">Свечение</h3>
+      <div class="glowbox">--glow · блок ИИ и акцентные панели</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ КНОПКИ ============ -->
+<section class="block" id="buttons"><div class="wrap">
+  <h2>Кнопки</h2>
+  <p class="lead">Одно главное действие на экран — лаймовая заливка. Остальное — контурные и нейтральные.</p>
+
+  <h3 class="sub" style="margin-top:0">Варианты</h3>
+  <div class="stage"><div class="row">
+    <button class="btn btn-primary">Главное действие</button>
+    <button class="btn btn-primary">Со стрелкой <svg class="i"><use href="#i-arrow-r"/></svg></button>
+    <button class="btn btn-outline">Контурная лайм</button>
+    <button class="btn btn-neutral">Нейтральная</button>
+    <button class="btn btn-secondary">Вторичная</button>
+    <button class="btn btn-ghost">Текстовая</button>
+    <button class="btn btn-icon" aria-label="Избранное"><svg class="i"><use href="#i-heart"/></svg></button>
+    <button class="btn btn-icon on" aria-label="Избранное, выбрано"><svg class="i" style="fill:currentColor"><use href="#i-heart"/></svg></button>
+  </div></div>
+
+  <h3 class="sub">Размеры</h3>
+  <div class="stage"><div class="row">
+    <button class="btn btn-primary btn-sm">Малая · 34</button>
+    <button class="btn btn-primary">Средняя · 44</button>
+    <button class="btn btn-primary btn-lg">Крупная · 52</button>
+  </div></div>
+
+  <h3 class="sub">Состояния</h3>
+  <div class="stage states">
+    <span class="h"></span><span class="h">По умолчанию</span><span class="h">Наведение</span><span class="h">Нажатие</span><span class="h">Фокус</span><span class="h">Загрузка</span><span class="h">Отключена</span>
+    <span class="h">Заливка</span>
+    <button class="btn btn-primary">Кнопка</button>
+    <button class="btn btn-primary" style="background:var(--lime-hover)">Кнопка</button>
+    <button class="btn btn-primary" style="background:var(--lime-press)">Кнопка</button>
+    <button class="btn btn-primary is-focus">Кнопка</button>
+    <button class="btn btn-primary is-loading">Кнопка</button>
+    <button class="btn btn-primary" disabled>Кнопка</button>
+    <span class="h">Контур</span>
+    <button class="btn btn-outline">Кнопка</button>
+    <button class="btn btn-outline" style="background:var(--lime-soft);border-color:var(--lime)">Кнопка</button>
+    <button class="btn btn-outline" style="background:var(--lime-soft);border-color:var(--lime);transform:translateY(1px)">Кнопка</button>
+    <button class="btn btn-outline is-focus">Кнопка</button>
+    <button class="btn btn-outline is-loading">Кнопка</button>
+    <button class="btn btn-outline" disabled>Кнопка</button>
+  </div>
+</div></section>
+
+<!-- ============ ПОЛЯ ============ -->
+<section class="block" id="forms"><div class="wrap">
+  <h2>Поля и выбор</h2>
+  <p class="lead">Поля с тонкой границей; в фокусе граница становится акцентной, вокруг — мягкое лаймовое кольцо. Ошибка красная, с текстом под полем.</p>
+
+  <div class="grid g3">
+    <div class="field"><label for="f1">Обычное поле</label><input id="f1" class="input" placeholder="Подсказка в поле"><span class="hint">Пояснение под полем</span></div>
+    <div class="field"><label for="f2">В фокусе</label><input id="f2" class="input" style="border-color:var(--accent-fg);box-shadow:0 0 0 3px var(--lime-soft)" value="Введённый текст"></div>
+    <div class="field"><label for="f3">С ошибкой</label><input id="f3" class="input is-error" value="Неверное значение"><span class="hint err">Текст ошибки, что исправить</span></div>
+    <div class="field"><label for="f4">Пароль</label><div class="input-wrap"><input id="f4" class="input" type="password" value="password123"><button class="end" aria-label="Показать"><svg class="i"><use href="#i-eye"/></svg></button></div><span class="hint">Минимум 8 символов</span></div>
+    <div class="field"><label for="f5">Отключённое</label><input id="f5" class="input" placeholder="Недоступно" disabled></div>
+    <div class="field"><label>Код из письма</label><div class="code"><span class="on">4</span><span></span><span></span><span></span><span></span><span></span></div></div>
+  </div>
+
+  <h3 class="sub">Поиск</h3>
+  <div class="stage" style="max-width:640px"><div class="search"><input placeholder="Найти по названию…" aria-label="Поиск"><button aria-label="Искать"><svg class="i"><use href="#i-search"/></svg></button></div></div>
+
+  <h3 class="sub">Выбор</h3>
+  <div class="grid g3">
+    <div class="stage" style="display:grid;gap:14px">
+      <label class="check"><input type="checkbox"><span>Не выбрано</span></label>
+      <label class="check"><input type="checkbox" checked><span>Выбрано, <a href="#forms">с ссылкой</a></span></label>
+      <label class="check"><input type="checkbox" disabled><span style="opacity:.5">Отключено</span></label>
+    </div>
+    <div class="stage" style="display:grid;gap:14px">
+      <label class="row" style="justify-content:space-between;font-size:14px;color:var(--text-2)">Выключено <span class="switch"><input type="checkbox" aria-label="Переключатель"></span></label>
+      <label class="row" style="justify-content:space-between;font-size:14px;color:var(--text-2)">Включено <span class="switch"><input type="checkbox" checked aria-label="Переключатель"></span></label>
+    </div>
+    <div class="stage" style="padding:0">
+      <div class="panel" style="border:0;background:transparent;display:grid;gap:10px">
+        <div class="field"><label>Список с выбором</label><div class="input" style="display:flex;align-items:center;justify-content:space-between;color:var(--text-2)">Выберите значение <svg class="i"><use href="#i-chev-d"/></svg></div></div>
+        <label class="check"><input type="checkbox" checked><span>Пункт 1</span></label>
+        <label class="check"><input type="checkbox"><span>Пункт 2</span></label>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ ФИЛЬТРЫ, ВКЛАДКИ ============ -->
+<section class="block" id="filters"><div class="wrap">
+  <h2>Чипы, вкладки, сегменты</h2>
+  <p class="lead">Чипы — полностью скруглённые. Активный чип заливается лаймом.</p>
+
+  <h3 class="sub" style="margin-top:0">Чипы</h3>
+  <div class="stage"><div class="row">
+    <span class="chip active">Все</span>
+    <span class="chip">Вариант</span>
+    <span class="chip"><svg class="i"><use href="#i-heart"/></svg>С иконкой</span>
+    <span class="chip">Ещё <svg class="i" style="color:var(--text-2)"><use href="#i-chev-d"/></svg></span>
+    <span class="chip inverse">Инверсный</span>
+    <span class="chip chip-sm">Малый</span>
+    <span class="chip chip-sm active">Малый выбран</span>
+  </div>
+  <div class="row" style="margin-top:14px"><span class="meta">Выбрано:</span>
+    <span class="chip tag chip-sm">Значение <svg class="i"><use href="#i-close"/></svg></span>
+    <span class="chip tag chip-sm">До 2500 <svg class="i"><use href="#i-close"/></svg></span>
+    <a class="link" href="#filters" style="font-size:13px">Сбросить всё</a>
+  </div></div>
+
+  <h3 class="sub">Вкладки и сегменты</h3>
+  <div class="stage">
+    <div class="tabs"><a class="active" href="#filters">Первая</a><a href="#filters">Вторая</a><a href="#filters">Третья</a><a href="#filters">Четвёртая</a><a href="#filters">Пятая</a></div>
+    <div class="row" style="margin-top:20px;justify-content:space-between">
+      <div class="segment" role="group" aria-label="Режим"><button class="active">Список</button><button>Карта</button></div>
+      <div class="pager"><a class="active" href="#filters">1</a><a href="#filters">2</a><a href="#filters">3</a><span class="meta">…</span><a href="#filters">24</a><a href="#filters" aria-label="Далее"><svg class="i"><use href="#i-arrow-r"/></svg></a></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ БЕЙДЖИ ============ -->
+<section class="block" id="badges"><div class="wrap">
+  <h2>Бейджи и метки</h2>
+  <p class="lead">Малые метки поверх изображений и в заголовках. Прямоугольные — статусы, «пилюли» — категории.</p>
+  <div class="stage"><div class="row">
+    <span class="badge new">Новое</span>
+    <span class="badge accent">Акцентный контур</span>
+    <span class="badge accent pill">Контур-пилюля</span>
+    <span class="badge accent"><svg class="i"><use href="#i-star"/></svg>С иконкой</span>
+    <span class="badge warm">Внимание</span>
+    <span class="badge ok">Успех</span>
+    <span class="badge mute">Нейтральный</span>
+    <span class="rating"><svg class="i"><use href="#i-star"/></svg>4.7 <span>(1287)</span></span>
+    <span class="rating"><svg class="i"><use href="#i-star"/></svg><svg class="i"><use href="#i-star"/></svg><svg class="i"><use href="#i-star"/></svg><svg class="i"><use href="#i-star"/></svg><svg class="i" style="fill:none"><use href="#i-star"/></svg></span>
+  </div></div>
+</div></section>
+
+<!-- ============ КАРТОЧКИ ============ -->
+<section class="block" id="cards"><div class="wrap">
+  <h2>Карточки и панели</h2>
+  <p class="lead">Изображение — главное. Вместо фотографий здесь градиенты-заглушки, в продукте подставляются реальные тёплые тёмные снимки.</p>
+
+  <h3 class="sub" style="margin-top:0">Карточка с изображением</h3>
+  <div class="grid g4">
+    <article class="card">
+      <div class="ph"><div class="tl"><span class="badge new">Новое</span></div><div class="tr"><button class="btn btn-icon btn-sm" aria-label="Избранное"><svg class="i"><use href="#i-heart"/></svg></button></div></div>
+      <div class="body"><h4>Заголовок карточки</h4><span class="meta">Категория · Район</span>
+        <div class="row-meta"><span class="meta">$$$ · 1500 ₽</span></div>
+        <div class="row-meta"><span class="rating"><svg class="i"><use href="#i-star"/></svg>4.7 <span>(1287)</span></span></div></div>
+    </article>
+    <article class="card">
+      <div class="ph b"><div class="tr"><button class="btn btn-icon btn-sm on" aria-label="Избранное"><svg class="i" style="fill:currentColor"><use href="#i-heart"/></svg></button></div></div>
+      <div class="body"><h4>Заголовок карточки</h4><span class="meta">Категория · Район</span>
+        <div class="row-meta"><span class="badge accent pill">Метка</span></div></div>
+    </article>
+    <article class="card">
+      <div class="ph c"><div class="tl"><span class="badge warm">Мало мест</span></div></div>
+      <div class="body"><div class="row-meta" style="margin:0 0 4px"><div class="datebox"><b>13</b><span>авг</span></div><span class="meta">19:00</span></div><h4>Событие или предложение</h4><span class="meta">Организатор · Район</span><b style="font-size:15px;margin-top:6px">4500 ₽</b></div>
+    </article>
+    <article class="card">
+      <div class="ph"><div class="tl"><span class="badge ok">Бесплатно</span></div></div>
+      <div class="body"><h4>Заголовок карточки</h4><span class="meta">Организатор · Район</span></div>
+    </article>
+  </div>
+
+  <h3 class="sub">Плитка с подписью на изображении</h3>
+  <div class="grid g4">
+    <div class="tile"><div class="ph"></div><div class="txt"><b>Название плитки</b><span>23 места</span></div></div>
+    <div class="tile"><div class="ph b"></div><div class="txt"><b>Название плитки</b><span>18 мест</span></div></div>
+    <div class="tile"><div class="ph c"></div><div class="txt"><b>Название плитки</b><span>25 мест</span></div></div>
+    <div class="tile"><div class="ph"></div><div class="txt"><span class="badge new" style="margin-bottom:6px">Новое</span><b>Название плитки</b><span>32 места</span></div></div>
+  </div>
+
+  <h3 class="sub">Показатели и списки</h3>
+  <div class="grid g3">
+    <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:12px;align-items:start">
+      <div class="card stat"><svg class="i"><use href="#i-pin"/></svg><b>24</b><span>Показатель</span></div>
+      <div class="card stat"><svg class="i"><use href="#i-list"/></svg><b>17</b><span>Показатель</span></div>
+      <div class="card stat"><svg class="i"><use href="#i-heart"/></svg><b>38</b><span>Показатель</span></div>
+    </div>
+    <div class="panel"><ul class="list">
+      <li><svg class="i"><use href="#i-calendar"/></svg><div>13 августа 2026<small>четверг</small></div></li>
+      <li><svg class="i"><use href="#i-clock"/></svg><div>19:00 – 22:30<small>около 3,5 часа</small></div></li>
+      <li><svg class="i"><use href="#i-pin"/></svg><div>Адрес или место<small>Район · 12 минут пешком</small></div></li>
+    </ul></div>
+    <div class="panel" style="display:grid;gap:10px">
+      <button class="btn btn-primary btn-block">Главное действие <svg class="i"><use href="#i-arrow-r"/></svg></button>
+      <button class="btn btn-neutral btn-block"><svg class="i"><use href="#i-heart"/></svg>Сохранить</button>
+      <button class="btn btn-neutral btn-block"><svg class="i"><use href="#i-share"/></svg>Поделиться</button>
+    </div>
+  </div>
+
+  <h3 class="sub">Акцентный блок с полем ввода</h3>
+  <div class="promo" data-theme="dark">
+    <svg class="sparks deco" viewBox="0 0 120 80" fill="none" aria-hidden="true"><path d="M40 8c2 16 9 23 25 25-16 2-23 9-25 25-2-16-9-23-25-25 16-2 23-9 25-25z" stroke="currentColor" stroke-width="1.500"/><path d="M92 40c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12z" fill="currentColor"/></svg>
+    <h4>Заголовок акцентного блока <span class="badge accent pill">Метка</span></h4>
+    <p>Короткое пояснение в одну–две строки. Блок обведён лаймовым контуром и слегка светится.</p>
+    <div class="search"><input placeholder="Подсказка в поле…" aria-label="Поле"><button aria-label="Отправить"><svg class="i"><use href="#i-arrow-r"/></svg></button></div>
+    <div class="lock"><svg class="i"><use href="#i-lock"/></svg>Пояснение об ограничении</div>
+  </div>
+</div></section>
+
+<!-- ============ НАВИГАЦИЯ ============ -->
+<section class="block" id="nav"><div class="wrap">
+  <h2>Навигация</h2>
+  <p class="lead">Верхняя панель на десктопе, нижняя на мобильных, боковое меню в кабинете. Активный пункт отмечен лаймом.</p>
+
+  <h3 class="sub" style="margin-top:0">Верхняя панель</h3>
+  <div class="header">
+    <a class="logo" href="#nav"><svg class="mark i" style="stroke:none"><use href="#i-logo"/></svg><b>Местами<br>вкусно</b></a>
+    <span class="city"><svg class="i" style="width:16px;height:16px"><use href="#i-pin"/></svg>Город <svg class="i" style="width:14px;height:14px"><use href="#i-chev-d"/></svg></span>
+    <nav><a class="active" href="#nav">Раздел</a><a href="#nav">Раздел</a><a href="#nav">Раздел</a><a href="#nav">Раздел</a></nav>
+    <button class="btn btn-icon btn-sm" style="background:none;border:0" aria-label="Избранное"><svg class="i"><use href="#i-heart"/></svg></button>
+    <button class="btn btn-neutral btn-sm">Вход</button>
+    <button class="btn btn-primary btn-sm">Регистрация</button>
+  </div>
+
+  <div class="grid g3" style="margin-top:var(--s-6);align-items:start">
+    <div>
+      <h3 class="sub" style="margin-top:0">Нижняя панель (мобильная)</h3>
+      <nav class="tabbar" aria-label="Пример нижней панели">
+        <a class="active" href="#nav"><svg class="i"><use href="#i-home"/></svg>Пункт</a>
+        <a href="#nav"><svg class="i"><use href="#i-list"/></svg>Пункт</a>
+        <a href="#nav"><svg class="i"><use href="#i-search"/></svg>Пункт</a>
+        <a href="#nav"><svg class="i"><use href="#i-heart"/></svg>Пункт</a>
+        <a href="#nav"><svg class="i"><use href="#i-user"/></svg>Пункт</a>
+      </nav>
+    </div>
+    <div>
+      <h3 class="sub" style="margin-top:0">Боковое меню</h3>
+      <nav class="sidebar" aria-label="Пример бокового меню">
+        <a class="active" href="#nav"><svg class="i"><use href="#i-home"/></svg>Пункт</a>
+        <a href="#nav"><svg class="i"><use href="#i-user"/></svg>Пункт</a>
+        <a href="#nav"><svg class="i"><use href="#i-heart"/></svg>Пункт</a>
+        <a href="#nav"><svg class="i"><use href="#i-settings"/></svg>Пункт</a>
+        <a href="#nav" style="margin-top:8px;color:var(--text-2)"><svg class="i"><use href="#i-logout"/></svg>Выйти</a>
+      </nav>
+    </div>
+    <div>
+      <h3 class="sub" style="margin-top:0">Навигационная цепочка</h3>
+      <div class="crumbs"><a href="#nav">Главная</a><svg class="i" style="width:14px;height:14px"><use href="#i-chev-r"/></svg><a href="#nav">Раздел</a><svg class="i" style="width:14px;height:14px"><use href="#i-chev-r"/></svg><b>Текущая страница</b></div>
+      <h3 class="sub">Возврат</h3>
+      <a class="row" href="#nav" style="text-decoration:none;color:var(--text-2);font-size:14px;gap:8px"><svg class="i" style="width:16px;height:16px"><use href="#i-arrow-l"/></svg>На главную</a>
+    </div>
+  </div>
+
+  <h3 class="sub">Подвал</h3>
+  <div class="footer">
+    <div><a class="logo" href="#nav"><svg class="mark i" style="stroke:none"><use href="#i-logo"/></svg><b>Местами<br>вкусно</b></a><p>Короткое описание сервиса в две–три строки.</p>
+      <div class="soc"><button class="btn btn-icon btn-sm" aria-label="Ссылка 1"><svg class="i"><use href="#i-plane"/></svg></button><button class="btn btn-icon btn-sm" aria-label="Ссылка 2"><svg class="i"><use href="#i-share"/></svg></button></div></div>
+    <div><h5>Раздел</h5><a href="#nav">Ссылка</a><a href="#nav">Ссылка</a><a href="#nav">Ссылка</a></div>
+    <div><h5>Раздел</h5><a href="#nav">Ссылка</a><a href="#nav">Ссылка</a><a href="#nav">Ссылка</a></div>
+    <div><h5>Раздел</h5><a href="#nav">Ссылка</a><a href="#nav">Ссылка</a><a href="#nav">Ссылка</a></div>
+  </div>
+</div></section>
+
+<!-- ============ ИКОНКИ ============ -->
+<section class="block" id="icons"><div class="wrap">
+  <h2>Иконки и декор</h2>
+  <p class="lead">Контурные иконки 24 px, штрих 1.75 px, скруглённые концы. Активное состояние — лаймовая заливка. Фирменный мотив — пунктирный маршрут, метка и искры.</p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(96px,1fr))" id="iconGrid"></div>
+
+  <h3 class="sub">Фирменный мотив</h3>
+  <div class="stage" style="display:grid;place-items:center;padding:var(--s-8)">
+    <svg class="deco" viewBox="0 0 540 200" width="540" style="max-width:100%" fill="none" aria-hidden="true">
+      <path d="M10 170C90 190 150 110 230 120s120 60 170 0 60-90 105-70" stroke="currentColor" stroke-width="1.500" stroke-dasharray="5 7" stroke-linecap="round"/>
+      <circle cx="10" cy="170" r="6" stroke="currentColor" stroke-width="2"/>
+      <path d="M505 8c-10 0-17 7.500-17 17 0 12 17 27 17 27s17-15 17-27c0-9.500-7-17-17-17z" class="pinbody" stroke="currentColor" stroke-width="2"/><circle cx="505" cy="25" r="5" fill="currentColor"/>
+      <path d="M330 60c1.500 11 6 15.500 17 17-11 1.500-15.500 6-17 17-1.500-11-6-15.500-17-17 11-1.500 15.500-6 17-17z" fill="currentColor"/>
+    </svg>
+    <span class="cap">Пунктир 5/7, штрих 1.5 px; метка-пин и четырёхконечная искра. В тёмной теме лайм, в светлой чёрный с лаймовой меткой</span>
+  </div>
+</div></section>
+
+</main>
+
+<footer style="padding:var(--s-8) 0 var(--s-12)"><div class="wrap"><p class="cap" style="margin:0">Каркас дизайна «Местами вкусно» · версия 0.1 · токены — в блоке <code>:root</code> в начале файла. Логотип на странице — текстовый макет, заменить оригинальным знаком.</p></div></footer>
+
+<script>
+  // Тема: по умолчанию тёмная, выбор пользователя запоминается.
+  (function () {
+    var root = document.documentElement, KEY = 'mv-theme';
+    function tokens() {
+      var cs = getComputedStyle(root);
+      document.querySelectorAll('code[data-token]').forEach(function (el) {
+        var t = el.getAttribute('data-token'), v = cs.getPropertyValue(t).trim().replace(/\s+/g, ' ');
+        el.textContent = t + ' · ' + (/^#/.test(v) ? v.toUpperCase() : v);
+      });
+    }
+    function apply(theme) {
+      root.setAttribute('data-theme', theme);
+      var tc = document.querySelector('meta[name="theme-color"]');
+      if (tc) tc.setAttribute('content', theme === 'light' ? '#FFFFFF' : '#0D0D0D');
+      document.querySelectorAll('[data-set-theme]').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-set-theme') === theme));
+      });
+      tokens();
+    }
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    apply(saved === 'light' ? 'light' : 'dark');
+    document.querySelectorAll('[data-set-theme]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var t = b.getAttribute('data-set-theme');
+        apply(t);
+        try { localStorage.setItem(KEY, t); } catch (e) {}
+      });
+    });
+  })();
+
+  // Сетка иконок строится из тех же символов, что и в интерфейсе.
+  (function () {
+    var grid = document.getElementById('iconGrid');
+    document.querySelectorAll('symbol[id^="i-"]').forEach(function (s) {
+      if (s.id === 'i-logo') return;
+      var d = document.createElement('div');
+      d.className = 'card ico';
+      d.innerHTML = '<svg class="i"><use href="#' + s.id + '"/></svg><span class="mono">' + s.id.slice(2) + '</span>';
+      grid.appendChild(d);
+    });
+  })();
+</script>
+</body>
+</html>
