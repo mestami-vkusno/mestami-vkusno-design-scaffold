@@ -1,10 +1,6 @@
-export interface ShowcaseSectionMeta {
-  id: string
-  /** Короткое название для навигации по странице. */
-  navLabel: string
-}
+import type { SiteTopbarSection } from '@/shell/site-topbar'
 
-export const SHOWCASE_SECTIONS: readonly ShowcaseSectionMeta[] = [
+export const SHOWCASE_SECTIONS: readonly SiteTopbarSection[] = [
   { id: 'colors', navLabel: 'Цвета' },
   { id: 'themes', navLabel: 'Темы' },
   { id: 'type', navLabel: 'Типографика' },

@@ -8,7 +8,8 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    // Инспектор Vue тяжёлый и вешает свой оверлей: включается только по запросу (VUE_DEVTOOLS=1 bun dev).
+    process.env.VUE_DEVTOOLS === '1' ? vueDevTools() : null,
   ],
   resolve: {
     alias: {

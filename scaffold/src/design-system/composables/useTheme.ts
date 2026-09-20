@@ -30,6 +30,8 @@ function applyToDocument(next: ThemeName): void {
 export function initTheme(): void {
   theme.value = readSaved()
   applyToDocument(theme.value)
+  // Круг перерисовывает весь экран на каждом кадре: на телефонах по умолчанию дешёвое затухание.
+  transitionMode.value = window.matchMedia('(pointer: coarse)').matches ? 'fade' : 'reveal'
   pointer.x = window.innerWidth / 2
   window.addEventListener(
     'pointerdown',

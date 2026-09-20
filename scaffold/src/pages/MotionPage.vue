@@ -2,11 +2,10 @@
 import { onBeforeUnmount } from 'vue'
 import { LazyMotion, MotionConfig } from 'motion-v'
 import { useMotion } from '@/design-system'
-import SiteTopbar from '@/shell/SiteTopbar.vue'
+import { useProgressiveMount } from '@/shell/useProgressiveMount'
 import ShowcaseFooter from '@/showcase/components/ShowcaseFooter.vue'
 import MotionHero from '@/motion/components/MotionHero.vue'
 import MotionToolbar from '@/motion/components/MotionToolbar.vue'
-import { MOTION_SECTIONS } from '@/motion/data/sections'
 import MotionButtonsSection from '@/motion/sections/MotionButtonsSection.vue'
 import MotionGesturesSection from '@/motion/sections/MotionGesturesSection.vue'
 import MotionListsSection from '@/motion/sections/MotionListsSection.vue'
@@ -16,6 +15,8 @@ import MotionRestraintSection from '@/motion/sections/MotionRestraintSection.vue
 import MotionThemeSection from '@/motion/sections/MotionThemeSection.vue'
 import MotionTokensSection from '@/motion/sections/MotionTokensSection.vue'
 
+const SECTIONS = [MotionTokensSection, MotionButtonsSection, MotionThemeSection, MotionPagesSection, MotionOverlaysSection, MotionListsSection, MotionGesturesSection, MotionRestraintSection]
+const { shown, done } = useProgressiveMount(SECTIONS.length)
 const { motionConfigMode, setScale, setReducedMode } = useMotion()
 const loadMotionFeatures = () => import('@/motion/features').then((module) => module.default)
 
@@ -28,24 +29,16 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="page">
-    <SiteTopbar :sections="MOTION_SECTIONS" />
     <MotionConfig :reduced-motion="motionConfigMode">
       <LazyMotion :features="loadMotionFeatures" strict>
-      <main id="top" class="motion-page">
-        <MotionHero />
-        <MotionTokensSection />
-        <MotionButtonsSection />
-        <MotionThemeSection />
-        <MotionPagesSection />
-        <MotionOverlaysSection />
-        <MotionListsSection />
-        <MotionGesturesSection />
-        <MotionRestraintSection />
-      </main>
+        <main id="top" class="motion-page">
+          <MotionHero />
+          <component :is="section" v-for="(section, index) in SECTIONS.slice(0, shown)" :key="index" />
+        </main>
       </LazyMotion>
     </MotionConfig>
-    <ShowcaseFooter />
-    <MotionToolbar />
+    <ShowcaseFooter v-if="done" />
+    <Teleport to="body"><MotionToolbar /></Teleport>
   </div>
 </template>
 

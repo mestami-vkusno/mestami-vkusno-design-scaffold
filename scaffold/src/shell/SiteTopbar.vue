@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { UiLogo, UiThemeSwitch, useTheme } from '@/design-system'
 import ShowcaseContainer from '@/showcase/components/ShowcaseContainer.vue'
-
-export interface SiteTopbarSection {
-  id: string
-  /** Короткое название для навигации по странице. */
-  navLabel: string
-}
+import type { SiteTopbarSection } from './site-topbar'
 
 defineProps<{ sections: readonly SiteTopbarSection[] }>()
 
@@ -34,7 +29,6 @@ const { theme, setTheme } = useTheme()
   top: 0;
   z-index: 10;
   background: var(--topbar-bg);
-  backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
 }
 
@@ -96,6 +90,19 @@ const { theme, setTheme } = useTheme()
   .site-topbar__link:hover {
     color: var(--text);
     background: var(--surface);
+  }
+}
+
+/* Размытие фона под шапкой дорого на телефонах: там шапка непрозрачная. */
+@media (pointer: fine) {
+  .site-topbar {
+    backdrop-filter: blur(10px);
+  }
+}
+
+@media (pointer: coarse) {
+  .site-topbar {
+    background: var(--bg);
   }
 }
 

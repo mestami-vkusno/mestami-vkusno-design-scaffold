@@ -43,7 +43,8 @@ const reducedModel = computed({
 <style scoped>
 .motion-toolbar {
   position: fixed;
-  left: 50%;
+  inset-inline: 0;
+  margin-inline: auto;
   bottom: max(12px, env(safe-area-inset-bottom));
   z-index: 20;
   display: flex;
@@ -53,9 +54,7 @@ const reducedModel = computed({
   width: max-content;
   max-width: calc(100vw - 24px);
   padding: 8px 12px;
-  transform: translateX(-50%);
-  background: var(--topbar-bg);
-  backdrop-filter: blur(12px);
+  background: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: var(--r-xl);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);

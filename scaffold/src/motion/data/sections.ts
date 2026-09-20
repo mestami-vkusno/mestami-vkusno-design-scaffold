@@ -1,4 +1,4 @@
-import type { SiteTopbarSection } from '@/shell/SiteTopbar.vue'
+import type { SiteTopbarSection } from '@/shell/site-topbar'
 
 export const MOTION_SECTIONS: readonly SiteTopbarSection[] = [
   { id: 'tokens', navLabel: 'Токены' },

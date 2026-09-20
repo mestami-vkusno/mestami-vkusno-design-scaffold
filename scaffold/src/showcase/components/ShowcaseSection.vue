@@ -20,6 +20,9 @@ defineSlots<{ default(): unknown; lead?(): unknown }>()
   padding: var(--s-12) 0;
   border-bottom: 1px solid var(--border);
   scroll-margin-top: 104px;
+  /* Разделы вне экрана не считаются и не рисуются: главный выигрыш по кадрам на длинной странице на телефоне. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
 }
 
 .showcase-section__title {

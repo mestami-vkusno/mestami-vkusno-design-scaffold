@@ -1,8 +1,7 @@
 <script setup lang="ts">
+import { useProgressiveMount } from '@/shell/useProgressiveMount'
 import ShowcaseFooter from '@/showcase/components/ShowcaseFooter.vue'
 import ShowcaseHero from '@/showcase/components/ShowcaseHero.vue'
-import SiteTopbar from '@/shell/SiteTopbar.vue'
-import { SHOWCASE_SECTIONS } from '@/showcase/data/sections'
 import BadgesSection from '@/showcase/sections/BadgesSection.vue'
 import ButtonsSection from '@/showcase/sections/ButtonsSection.vue'
 import CardsSection from '@/showcase/sections/CardsSection.vue'
@@ -14,25 +13,17 @@ import NavigationSection from '@/showcase/sections/NavigationSection.vue'
 import ShapeSection from '@/showcase/sections/ShapeSection.vue'
 import ThemesSection from '@/showcase/sections/ThemesSection.vue'
 import TypographySection from '@/showcase/sections/TypographySection.vue'
+
+const SECTIONS = [ColorsSection, ThemesSection, TypographySection, ShapeSection, ButtonsSection, FormsSection, FiltersSection, BadgesSection, CardsSection, NavigationSection, IconsSection]
+const { shown, done } = useProgressiveMount(SECTIONS.length)
 </script>
 
 <template>
   <div class="page">
-  <SiteTopbar :sections="SHOWCASE_SECTIONS" />
-  <main id="top">
-    <ShowcaseHero />
-    <ColorsSection />
-    <ThemesSection />
-    <TypographySection />
-    <ShapeSection />
-    <ButtonsSection />
-    <FormsSection />
-    <FiltersSection />
-    <BadgesSection />
-    <CardsSection />
-    <NavigationSection />
-    <IconsSection />
-  </main>
-  <ShowcaseFooter />
+    <main id="top">
+      <ShowcaseHero />
+      <component :is="section" v-for="(section, index) in SECTIONS.slice(0, shown)" :key="index" />
+    </main>
+    <ShowcaseFooter v-if="done" />
   </div>
 </template>
