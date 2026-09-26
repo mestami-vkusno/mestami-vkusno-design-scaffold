@@ -4,7 +4,7 @@ import UiImage from '../../atoms/UiImage/UiImage.vue'
 import UiSurface from '../../atoms/UiSurface/UiSurface.vue'
 import type { UiMediaCardProps } from './types'
 
-withDefaults(defineProps<UiMediaCardProps>(), { favoriteLabel: 'В избранное' })
+withDefaults(defineProps<UiMediaCardProps>(), { layout: 'column', favoriteLabel: 'В избранное' })
 defineSlots<{
   /** Метки в левом верхнем углу изображения. */
   badges?(): unknown
@@ -18,14 +18,16 @@ const favorite = defineModel<boolean>('favorite', { default: false })
 </script>
 
 <template>
-  <UiSurface as="article" class="ui-media-card">
-    <UiImage :src="src" :alt="title" :tone="tone">
-      <template v-if="$slots.badges" #top-start><slot name="badges" /></template>
+  <UiSurface as="article" class="ui-media-card" :class="`ui-media-card--${layout}`">
+    <UiImage :src="src" :alt="title" :tone="tone" :ratio="layout === 'row' ? 'fill' : '4/3'" class="ui-media-card__image">
+      <template v-if="$slots.badges && layout === 'column'" #top-start><slot name="badges" /></template>
       <template v-if="showFavorite" #top-end>
         <UiIconButton v-model:pressed="favorite" icon="heart" size="sm" :label="favoriteLabel" />
       </template>
     </UiImage>
     <div class="ui-media-card__body">
+      <!-- В узкой колонке фото метки не помещаются рядом с кнопкой избранного: в строке они идут над заголовком. -->
+      <div v-if="$slots.badges && layout === 'row'" class="ui-media-card__eyebrow"><slot name="badges" /></div>
       <div v-if="$slots.eyebrow" class="ui-media-card__eyebrow"><slot name="eyebrow" /></div>
       <h4 class="ui-media-card__title">{{ title }}</h4>
       <span v-if="subtitle" class="ui-media-card__subtitle">{{ subtitle }}</span>
@@ -35,6 +37,31 @@ const favorite = defineModel<boolean>('favorite', { default: false })
 </template>
 
 <style scoped>
+/* Фото слева: колонка фиксированной ширины, высоту карточки задаёт текст (не ниже самой колонки). */
+.ui-media-card--row {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  min-height: 104px;
+}
+
+.ui-media-card--row .ui-media-card__image {
+  height: auto;
+  min-height: 104px;
+}
+
+.ui-media-card--row .ui-media-card__body {
+  justify-content: center;
+  padding: var(--s-3);
+}
+
+.ui-media-card--row .ui-media-card__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 15px;
+}
+
 .ui-media-card__body {
   display: flex;
   flex-direction: column;

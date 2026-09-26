@@ -21,6 +21,8 @@ export interface NavItem {
 export interface OptionItem {
   id: string
   label: string
+  /** Точка «есть непрочитанное» после подписи (`UiTabs`); `UiSegmented` её не рисует. */
+  dot?: boolean
 }
 
 export interface SelectOption {

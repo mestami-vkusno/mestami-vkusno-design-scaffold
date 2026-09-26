@@ -12,6 +12,7 @@
   --field:         #141414;   /* поля ввода */
   --border:        #2A2A2A;   /* границы и разделители */
   --border-strong: #3D3D3D;   /* границы элементов управления */
+  --border-hover:  #555555;   /* граница поля и кнопки при наведении */
 
   /* Текст */
   --text:          #FFFFFF;
@@ -54,6 +55,9 @@
   --promo-tint:     rgba(204, 255, 0, .10);
   --mark:           #CCFF00;   --mark-fill: none;   --pin-fill: var(--bg);
   --shadow-card:    none;
+  --shadow-float:   0 8px 24px rgba(0, 0, 0, .3);   /* всплывающие слои: тосты */
+  /* Затемнение поверх фото и под шторкой: тёмное в обеих темах, поверх него — светлый текст */
+  --scrim:          rgba(0, 0, 0, .6);  --scrim-strong: rgba(0, 0, 0, .78);  --on-scrim: #FFFFFF;  --on-scrim-track: rgba(255, 255, 255, .3);
 
   /* Как лайм ведёт себя в компонентах (в тёмной — сам лайм, в светлой — подложка-маркер) */
   --accent-mark:    none;                     /* маркер под акцентным словом */
@@ -84,6 +88,7 @@
   --field:         #FFFFFF;
   --border:        #E3E3E3;
   --border-strong: #8A8A8A;   /* ≥ 3:1 на белом — граница элементов управления */
+  --border-hover:  #555555;
 
   --text:          #0D0D0D;
   --text-2:        #4B4B4B;
@@ -113,6 +118,8 @@
   --promo-tint:     rgba(204, 255, 0, .10);
   --mark:           #0D0D0D;  --mark-fill: #CCFF00;  --pin-fill: #CCFF00;
   --shadow-card:    0 1px 2px rgba(0, 0, 0, .05), 0 10px 28px rgba(0, 0, 0, .06);
+  --shadow-float:   0 8px 24px rgba(0, 0, 0, .3);
+  --scrim:          rgba(0, 0, 0, .6);  --scrim-strong: rgba(0, 0, 0, .78);  --on-scrim: #FFFFFF;  --on-scrim-track: rgba(255, 255, 255, .3);
 
   --accent-mark:    linear-gradient(transparent 52%, var(--lime) 52%, var(--lime) 94%, transparent 94%);
   --link-line:      var(--lime);  --link-thick: 3px;

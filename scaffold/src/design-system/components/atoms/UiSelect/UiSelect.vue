@@ -43,7 +43,7 @@ const model = defineModel<string>({ default: '' })
 }
 
 .ui-select__control:hover {
-  border-color: #555;
+  border-color: var(--border-hover);
 }
 
 .ui-select__control:focus {

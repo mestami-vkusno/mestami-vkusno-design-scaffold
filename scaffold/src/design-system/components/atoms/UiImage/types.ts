@@ -6,5 +6,5 @@ export interface UiImageProps {
   alt?: string
   tone?: ImageTone
   /** Пропорции; `fill` — занять весь родитель. */
-  ratio?: '4/3' | '5/4' | 'fill'
+  ratio?: '4/3' | '5/4' | '1/1' | 'fill'
 }

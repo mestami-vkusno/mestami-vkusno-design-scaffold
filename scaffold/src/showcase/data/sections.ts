@@ -7,9 +7,12 @@ export const SHOWCASE_SECTIONS: readonly SiteTopbarSection[] = [
   { id: 'space', navLabel: 'Форма' },
   { id: 'buttons', navLabel: 'Кнопки' },
   { id: 'forms', navLabel: 'Поля' },
+  { id: 'inputs', navLabel: 'Ввод' },
   { id: 'filters', navLabel: 'Фильтры' },
   { id: 'badges', navLabel: 'Бейджи' },
   { id: 'cards', navLabel: 'Карточки' },
+  { id: 'lists', navLabel: 'Списки' },
+  { id: 'feedback', navLabel: 'Состояния' },
   { id: 'nav', navLabel: 'Навигация' },
   { id: 'icons', navLabel: 'Иконки' },
 ]

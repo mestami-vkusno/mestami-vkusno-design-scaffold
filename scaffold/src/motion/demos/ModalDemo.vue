@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { UiButton, UiCluster, UiText, useMotion } from '@/design-system'
-import { useAnimatedDialog } from '../composables/useAnimatedDialog'
+import { UiButton, UiCluster, UiText, useAnimatedDialog, useMotion } from '@/design-system'
 import MotionDemo from '../components/MotionDemo.vue'
 
 const { duration } = useMotion()

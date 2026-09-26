@@ -18,6 +18,9 @@ const selected = ref('')
 const unchecked = ref(false)
 const checkOne = ref(true)
 const checkTwo = ref(false)
+const today = new Date().toISOString().slice(0, 10)
+const visitDate = ref('')
+const futureDate = ref('2099-01-01')
 </script>
 
 <template>
@@ -44,6 +47,12 @@ const checkTwo = ref(false)
       </UiField>
       <UiField label="Код из письма">
         <template #default="{ id }"><UiCodeInput :id="id" v-model="code" /></template>
+      </UiField>
+      <UiField label="Дата посещения" hint="Не позднее сегодняшнего дня">
+        <template #default="{ id, describedBy }"><UiInput :id="id" v-model="visitDate" type="date" :max="today" :aria-describedby="describedBy" /></template>
+      </UiField>
+      <UiField label="Дата с ошибкой" error="Дата не может быть в будущем">
+        <template #default="{ id, describedBy, invalid: isInvalid }"><UiInput :id="id" v-model="futureDate" type="date" :max="today" :aria-describedby="describedBy" :invalid="isInvalid" /></template>
       </UiField>
     </UiGrid>
 

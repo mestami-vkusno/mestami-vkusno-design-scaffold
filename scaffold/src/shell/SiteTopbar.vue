@@ -13,8 +13,10 @@ const { theme, setTheme } = useTheme()
     <ShowcaseContainer class="site-topbar__inner">
       <UiLogo href="#top" class="site-topbar__logo" />
       <nav class="site-topbar__nav" aria-label="Разделы страницы">
-        <RouterLink class="site-topbar__page" to="/">Система</RouterLink>
+        <RouterLink class="site-topbar__page" to="/">Продукт</RouterLink>
+        <RouterLink class="site-topbar__page" to="/design-system">Система</RouterLink>
         <RouterLink class="site-topbar__page" to="/motion">Анимации</RouterLink>
+        <RouterLink class="site-topbar__page" to="/features">Блоки</RouterLink>
         <span class="site-topbar__divider" aria-hidden="true" />
         <a v-for="section in sections" :key="section.id" class="site-topbar__link" :href="`#${section.id}`">{{ section.navLabel }}</a>
       </nav>

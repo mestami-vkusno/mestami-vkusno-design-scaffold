@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { UiBadge, UiButton, UiDateBox, UiGrid, UiInfoList, UiMediaCard, UiPromoPanel, UiRating, UiSearchInput, UiStatCard, UiStack, UiSurface, UiText, UiTile } from '@/design-system'
+import { UiBadge, UiButton, UiDateBox, UiGrid, UiImage, UiInfoList, UiMediaCard, UiPromoPanel, UiRating, UiSearchInput, UiStatCard, UiStack, UiSurface, UiText, UiTile } from '@/design-system'
 import { INFO_ITEMS } from '../data/cards'
 import ShowcaseSection from '../components/ShowcaseSection.vue'
 import ShowcaseSubheading from '../components/ShowcaseSubheading.vue'
@@ -33,6 +33,13 @@ const promoQuery = ref('')
       <UiMediaCard title="Заголовок карточки" subtitle="Организатор · Район">
         <template #badges><UiBadge variant="success">Бесплатно</UiBadge></template>
       </UiMediaCard>
+    </UiGrid>
+
+    <ShowcaseSubheading>Квадратные снимки</ShowcaseSubheading>
+    <UiGrid :min="110" :gap="2">
+      <UiImage ratio="1/1" />
+      <UiImage ratio="1/1" tone="dusk" />
+      <UiImage ratio="1/1" tone="rust" />
     </UiGrid>
 
     <ShowcaseSubheading>Плитка с подписью на изображении</ShowcaseSubheading>

@@ -66,7 +66,7 @@ const emit = defineEmits<{ 'update:pressed': [value: boolean] }>()
 
 @media (pointer: coarse) {
   .ui-icon-button--sm {
-    --h: 40px;
+    --h: 44px;
   }
 }
 

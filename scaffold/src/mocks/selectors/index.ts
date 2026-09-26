@@ -1,0 +1,11 @@
+/* Селекторы мока. Каждая группа лежит в своём файле; страницы, которым важен размер чанка, могут импортировать `@/mocks/selectors/<группа>`. */
+export * from './activity'
+export * from './collections'
+export * from './events'
+export * from './home'
+export * from './library'
+export * from './menu'
+export * from './places'
+export * from './search'
+export * from './social'
+export * from './text'

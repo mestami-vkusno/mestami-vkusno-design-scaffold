@@ -108,7 +108,7 @@ const iconSize = computed(() => (props.size === 'sm' ? 16 : 20))
 .ui-button--neutral[data-preview='hover'],
 .ui-button--neutral[data-preview='pressed'] {
   background: var(--surface);
-  border-color: #555;
+  border-color: var(--border-hover);
 }
 
 .ui-button--secondary {
@@ -178,7 +178,7 @@ const iconSize = computed(() => (props.size === 'sm' ? 16 : 20))
 
   .ui-button--neutral:hover {
     background: var(--surface);
-    border-color: #555;
+    border-color: var(--border-hover);
   }
 
   .ui-button--secondary:hover {

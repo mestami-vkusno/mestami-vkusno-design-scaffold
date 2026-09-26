@@ -1,0 +1,123 @@
+/*
+  Авторские профили (`AuthorProfile`): публичные и один закрытый (§15).
+  Имена вымышлены. `u-maria` — единственный зарегистрированный пользователь мока (см. `library.ts`).
+*/
+import { photo } from './builders'
+import type { Author } from './types'
+
+/** Автор без публичного «О себе» и счётчиков: закрытый профиль показывает только имя и аватар (§15.2). */
+export const CLOSED_AUTHOR_ID = 'u-nikita'
+
+export const authors: readonly Author[] = [
+  {
+    id: 'u-maria',
+    username: 'maria_eats',
+    displayName: 'Мария Соколова',
+    about: 'Хожу по ресторанам Петроградки и записываю, что вкусно. Люблю итальянскую кухню и тихие места.',
+    avatar: photo('1:1', 'rust', 'Мария Соколова'),
+    profileVisibility: 'public',
+    followersCount: 24,
+    cityId: 'spb',
+    joinedAt: '2026-03-14',
+  },
+  {
+    id: 'u-anna',
+    username: 'anna_v',
+    displayName: 'Анна Ветрова',
+    about: 'Пишу про кофейни и завтраки Петербурга. Сравниваю флэт уайты и не люблю очереди.',
+    avatar: photo('1:1', 'gold', 'Анна Ветрова'),
+    profileVisibility: 'public',
+    followersCount: 12480,
+    cityId: 'spb',
+    joinedAt: '2025-11-02',
+  },
+  {
+    id: 'u-dmitry',
+    username: 'dima_gastro',
+    displayName: 'Дмитрий Лебедев',
+    about: 'Ужины с шефами, дегустационные сеты и сезонные меню. Оцениваю честно.',
+    avatar: photo('1:1', 'wine', 'Дмитрий Лебедев'),
+    profileVisibility: 'public',
+    followersCount: 8320,
+    cityId: 'spb',
+    joinedAt: '2025-09-20',
+  },
+  {
+    id: 'u-elena',
+    username: 'elena_kitchen',
+    displayName: 'Елена Крылова',
+    about: 'Повар-любитель. Ищу места, где готовят как дома, и записываю рецепты, которые удалось подсмотреть.',
+    avatar: photo('1:1', 'moss', 'Елена Крылова'),
+    profileVisibility: 'public',
+    followersCount: 5140,
+    cityId: 'spb',
+    joinedAt: '2025-12-08',
+  },
+  {
+    id: 'u-pavel',
+    username: 'pavel_music',
+    displayName: 'Павел Гринёв',
+    about: 'Джаз, живая музыка и уютные бары. Пишу, где хорошо сидеть вечером.',
+    avatar: photo('1:1', 'dusk', 'Павел Гринёв'),
+    profileVisibility: 'public',
+    followersCount: 3905,
+    cityId: 'spb',
+    joinedAt: '2026-01-19',
+  },
+  {
+    id: 'u-olga',
+    username: 'olga_moscow',
+    displayName: 'Ольга Смирнова',
+    about: 'Москва: завтраки, пекарни и рестораны на выходные.',
+    avatar: photo('1:1', 'sea', 'Ольга Смирнова'),
+    profileVisibility: 'public',
+    followersCount: 6760,
+    cityId: 'msk',
+    joinedAt: '2025-10-11',
+  },
+  {
+    id: 'u-ivan',
+    username: 'ivan_ramen',
+    displayName: 'Иван Белов',
+    about: 'Азиатская кухня: рамэн, вок, роллы. Сравниваю бульоны.',
+    avatar: photo('1:1', 'slate', 'Иван Белов'),
+    profileVisibility: 'public',
+    followersCount: 1220,
+    cityId: 'spb',
+    joinedAt: '2026-02-03',
+  },
+  {
+    id: 'u-sofia',
+    username: 'sofia_green',
+    displayName: 'София Данилова',
+    about: 'Вегетарианская и растительная кухня. Где хорошо готовят овощи.',
+    avatar: photo('1:1', 'moss', 'София Данилова'),
+    profileVisibility: 'public',
+    followersCount: 2870,
+    cityId: 'spb',
+    joinedAt: '2026-01-05',
+  },
+  {
+    id: CLOSED_AUTHOR_ID,
+    username: 'nikita_private',
+    displayName: 'Никита Орлов',
+    about: 'Пишу для себя и для друзей.',
+    avatar: photo('1:1', 'ember', 'Никита Орлов'),
+    profileVisibility: 'private',
+    followersCount: 410,
+    cityId: 'spb',
+    joinedAt: '2025-08-30',
+  },
+  {
+    // Заблокирован пользователем «Мария»: его публикации ей не показываются (§12.4).
+    id: 'u-igor',
+    username: 'igor_v',
+    displayName: 'Игорь В.',
+    about: 'Пишу коротко и резко.',
+    avatar: photo('1:1', 'slate', 'Игорь В.'),
+    profileVisibility: 'public',
+    followersCount: 95,
+    cityId: 'spb',
+    joinedAt: '2026-05-16',
+  },
+]

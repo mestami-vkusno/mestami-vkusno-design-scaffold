@@ -9,25 +9,28 @@ const emit = defineEmits<{ select: [item: TabBarItem] }>()
 
 function onSelect(item: TabBarItem, event: MouseEvent): void {
   if (!item.href) event.preventDefault()
-  active.value = item.id
+  if (!item.popup) active.value = item.id
   emit('select', item)
 }
 </script>
 
 <template>
   <nav class="ui-tab-bar" :style="{ gridTemplateColumns: `repeat(${items.length}, 1fr)` }" :aria-label="label">
-    <a
+    <component
+      :is="item.popup ? 'button' : 'a'"
       v-for="item in items"
       :key="item.id"
       class="ui-tab-bar__item"
-      :class="{ 'ui-tab-bar__item--active': active === item.id }"
-      :href="item.href ?? '#'"
-      :aria-current="active === item.id ? 'page' : undefined"
+      :class="{ 'ui-tab-bar__item--active': !item.popup && active === item.id, 'ui-tab-bar__item--popup': item.popup }"
+      :type="item.popup ? 'button' : undefined"
+      :href="item.popup ? undefined : (item.href ?? '#')"
+      :aria-haspopup="item.popup"
+      :aria-current="!item.popup && active === item.id ? 'page' : undefined"
       @click="onSelect(item, $event)"
     >
-      <UiIcon class="ui-tab-bar__icon" :name="item.icon" :filled="active === item.id" />
+      <UiIcon class="ui-tab-bar__icon" :name="item.icon" :filled="!item.popup && active === item.id" />
       {{ item.label }}
-    </a>
+    </component>
   </nav>
 </template>
 
@@ -55,6 +58,24 @@ function onSelect(item: TabBarItem, event: MouseEvent): void {
 .ui-tab-bar__item--active {
   color: var(--accent-fg);
   font-weight: 600;
+}
+
+/* Пункт-действие: кнопка без рамки, знак на лаймовой подложке того же размера, что у активной вкладки. */
+.ui-tab-bar__item--popup {
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.ui-tab-bar__item--popup .ui-tab-bar__icon {
+  box-sizing: content-box;
+  width: 24px;
+  height: 22px;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  background: var(--lime);
+  color: var(--on-accent);
 }
 
 .ui-tab-bar__item--active .ui-tab-bar__icon {

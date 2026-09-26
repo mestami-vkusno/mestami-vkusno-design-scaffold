@@ -1,27 +1,64 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { MOTION_SECTIONS } from '@/motion/data/sections'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { NOT_FOUND_PAGE, PAGES, type PageDefinition } from '@/shell/data/routes'
+import { rememberTabScroll, scrollBehavior } from '@/shell/scroll'
 import type { SiteTopbarSection } from '@/shell/site-topbar'
-import { SHOWCASE_SECTIONS } from '@/showcase/data/sections'
+import type { ProductNavId, ProductTabId, ShellChrome, ShellLayout } from '@/shell/types'
+
+const DOCUMENT_TITLE_SUFFIX = ' · Местами вкусно'
 
 declare module 'vue-router' {
   interface RouteMeta {
     title?: string
+    documentTitle?: string
+    /** Подсказка заглушки «Здесь будет …». */
+    hint?: string
+    pageId?: string
+    layout?: ShellLayout
+    tab?: ProductTabId
+    nav?: ProductNavId
+    keepAlive?: boolean
+    chrome?: ShellChrome
     /** Разделы страницы для якорной навигации в общей шапке. */
     sections?: readonly SiteTopbarSection[]
   }
 }
 
+/**
+ * Корневые вкладки держатся в памяти (`<KeepAlive>` в App.vue), а он сопоставляет по имени компонента:
+ * имя задаёт таблица маршрутов, а не файл страницы, поэтому оно не пропадёт при замене заглушки.
+ */
+function toRecord(definition: PageDefinition): RouteRecordRaw {
+  const { page, keepAlive } = definition
+  const component: RouteRecordRaw['component'] = keepAlive ? () => page().then((module) => ({ ...module.default, name: `tab:${definition.name}` })) : page
+  return {
+    path: definition.path,
+    name: definition.name,
+    component,
+    meta: {
+      title: definition.title,
+      documentTitle: definition.documentTitle,
+      hint: definition.hint,
+      pageId: definition.pageId,
+      layout: definition.layout,
+      tab: definition.tab,
+      nav: definition.nav,
+      keepAlive,
+      chrome: definition.chrome,
+      sections: definition.sections,
+    },
+  }
+}
+
 export const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    { path: '/', name: 'design-system', component: () => import('@/pages/DesignSystemPage.vue'), meta: { title: 'Дизайн-система «Местами вкусно»', sections: SHOWCASE_SECTIONS } },
-    { path: '/motion', name: 'motion', component: () => import('@/pages/MotionPage.vue'), meta: { title: 'Анимации · Местами вкусно', sections: MOTION_SECTIONS } },
-    { path: '/:pathMatch(.*)*', redirect: '/' },
-  ],
-  // Прокрутку вверх делает переход страниц (см. App.vue), чтобы уходящая страница не прыгала до затухания.
-  scrollBehavior: () => false,
+  routes: [...PAGES, NOT_FOUND_PAGE].map(toRecord),
+  scrollBehavior,
+})
+
+router.beforeEach((_to, from) => {
+  rememberTabScroll(from)
 })
 
 router.afterEach((to) => {
-  if (typeof to.meta.title === 'string') document.title = to.meta.title
+  document.title = to.meta.documentTitle ?? `${to.meta.title ?? 'Местами вкусно'}${DOCUMENT_TITLE_SUFFIX}`
 })

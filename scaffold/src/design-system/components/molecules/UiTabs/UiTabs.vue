@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useArrowNavigation } from '../../../composables'
+import UiBadge from '../../atoms/UiBadge/UiBadge.vue'
 import type { UiTabsProps } from './types'
 
 defineProps<UiTabsProps>()
@@ -22,7 +23,7 @@ const { onKeydown } = useArrowNavigation('[role="tab"]')
       :tabindex="model === item.id ? 0 : -1"
       @click="model = item.id"
     >
-      {{ item.label }}
+      {{ item.label }}<UiBadge v-if="item.dot" class="ui-tabs__dot" dot variant="accent" label="Есть непрочитанное" />
     </button>
   </div>
 </template>
@@ -45,6 +46,11 @@ const { onKeydown } = useArrowNavigation('[role="tab"]')
   font: 400 15px var(--font);
   white-space: nowrap;
   cursor: pointer;
+}
+
+.ui-tabs__dot {
+  margin-inline-start: var(--s-1);
+  vertical-align: middle;
 }
 
 .ui-tabs__tab:hover {

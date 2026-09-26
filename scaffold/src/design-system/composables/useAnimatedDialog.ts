@@ -5,7 +5,7 @@ export type DialogState = 'closed' | 'open'
 /**
  * Нативный <dialog> с анимацией входа и выхода: фокус, Escape и «инертность» фона даёт браузер.
  * `data-state` переключается после showModal(), поэтому переход стартует с закрытого вида;
- * закрывается диалог, когда отыграет выход.
+ * закрывается диалог, когда отыграет выход. Повторное открытие во время выхода отменяет закрытие.
  */
 export function useAnimatedDialog(refName: string, exitMs: () => number): {
   dialog: Readonly<Ref<HTMLDialogElement | null>>
@@ -20,10 +20,12 @@ export function useAnimatedDialog(refName: string, exitMs: () => number): {
 
   function open(): void {
     const element = dialog.value
-    if (!element || element.open) return
+    if (!element) return
     clearTimeout(timer)
-    element.showModal()
-    void element.offsetWidth
+    if (!element.open) {
+      element.showModal()
+      void element.offsetWidth
+    }
     state.value = 'open'
   }
 

@@ -37,7 +37,19 @@ export const ICON_SHAPES = {
   settings: [{ tag: 'circle', attrs: { cx: 12, cy: 12, r: 3 } }, { tag: 'path', attrs: { d: 'M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8' } }],
   logout: [{ tag: 'path', attrs: { d: 'M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10' } }],
   trash: [{ tag: 'path', attrs: { d: 'M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13' } }],
+  bell: [{ tag: 'path', attrs: { d: 'M6 10.5a6 6 0 0 1 12 0c0 4.5 1.5 6 2 7H4c.5-1 2-2.5 2-7z' } }, { tag: 'path', attrs: { d: 'M10 20.5a2 2 0 0 0 4 0' } }],
+  plus: [{ tag: 'path', attrs: { d: 'M12 5v14M5 12h14' } }],
+  feed: [{ tag: 'rect', attrs: { x: 3.5, y: 4, width: 17, height: 7.5, rx: 2 } }, { tag: 'path', attrs: { d: 'M3.5 15.5h17M3.5 19.5h10' } }],
   edit: [{ tag: 'path', attrs: { d: 'M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z' } }],
+  comment: [{ tag: 'path', attrs: { d: 'M5 4.5h14a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-8.5L7 20v-3.5H5A1.5 1.5 0 0 1 3.5 15V6A1.5 1.5 0 0 1 5 4.5z' } }],
+  more: [{ tag: 'circle', attrs: { cx: 5.5, cy: 12, r: 1.1 } }, { tag: 'circle', attrs: { cx: 12, cy: 12, r: 1.1 } }, { tag: 'circle', attrs: { cx: 18.5, cy: 12, r: 1.1 } }],
+  flag: [{ tag: 'path', attrs: { d: 'M6 21V4' } }, { tag: 'path', attrs: { d: 'M6 4.5h11.5l-2.5 4 2.5 4H6' } }],
+  image: [{ tag: 'rect', attrs: { x: 3.5, y: 4.5, width: 17, height: 15, rx: 2.5 } }, { tag: 'circle', attrs: { cx: 9, cy: 10, r: 1.6 } }, { tag: 'path', attrs: { d: 'm4 17 4.6-4.2 3.9 3.3 3.1-2.6 4.9 4' } }],
+  alert: [{ tag: 'path', attrs: { d: 'M10.3 4.6 2.9 17.5a2 2 0 0 0 1.7 3h14.8a2 2 0 0 0 1.7-3L13.7 4.6a2 2 0 0 0-3.4 0z' } }, { tag: 'path', attrs: { d: 'M12 9.5v4.2M12 17h.01' } }],
+  info: [{ tag: 'circle', attrs: { cx: 12, cy: 12, r: 8.5 } }, { tag: 'path', attrs: { d: 'M12 11v5.2M12 7.8h.01' } }],
+  'wifi-off': [{ tag: 'path', attrs: { d: 'M4 4l16 16' } }, { tag: 'path', attrs: { d: 'M2.8 9.4A15 15 0 0 1 7.6 6.5M11.5 5.6c3.6.2 6.9 1.6 9.7 3.8' } }, { tag: 'path', attrs: { d: 'M6 13a10 10 0 0 1 3-2.1M14 11c1.6.5 3 1.3 4 2.2' } }, { tag: 'path', attrs: { d: 'M9 16.4a4.5 4.5 0 0 1 3.2-1.2M15 16.2a4.5 4.5 0 0 0-.5-.4' } }, { tag: 'path', attrs: { d: 'M12 19.5h.01' } }],
+  'chev-u': [{ tag: 'path', attrs: { d: 'm6 15 6-6 6 6' } }],
+  mail: [{ tag: 'rect', attrs: { x: 3.5, y: 5.5, width: 17, height: 13, rx: 2.5 } }, { tag: 'path', attrs: { d: 'm4 8 8 5.5L20 8' } }],
 } as const satisfies Record<string, readonly IconShape[]>
 
 export type IconName = keyof typeof ICON_SHAPES

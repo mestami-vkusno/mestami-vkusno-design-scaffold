@@ -19,6 +19,7 @@
   --dur-modal: calc(250ms * var(--motion-scale));
   --dur-drawer: calc(500ms * var(--motion-scale));
   --dur-toast: calc(400ms * var(--motion-scale));
+  --dur-reflow: calc(300ms * var(--motion-scale));   /* соседи сдвигаются, когда элемент списка пришёл или ушёл */
   --dur-page-in: calc(220ms * var(--motion-scale));
   --dur-page-out: calc(120ms * var(--motion-scale));
   --dur-theme: calc(420ms * var(--motion-scale));
